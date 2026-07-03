@@ -46,7 +46,7 @@ jobs:
     - name: Download current ECS task definition
       run: |
         aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > task-def.json
-        jq 'del(.enableFaultInjection)' task-def.json > tmp.json && mv tmp.json task-def.json
+        jq 'del(.enableFaultInjection) | .cpu="256" | .memory="400" | .containerDefinitions[0].cpu=256 | .containerDefinitions[0].memory=400' task-def.json > tmp.json && mv tmp.json task-def.json
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
