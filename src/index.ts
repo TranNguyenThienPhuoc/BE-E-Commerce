@@ -10,11 +10,8 @@ import { setupShipmentRoutes } from "./infrastructure/routes/shipmentRoutes";
 import { setupReportRoutes } from "./infrastructure/routes/reportRoutes";
 import { setupCartRoutes } from "./infrastructure/routes/cartRoutes";
 import { setupUploadRoutes } from "./infrastructure/routes/uploadRoutes";
-import { setUpWebsocketRoute } from "./infrastructure/routes/wsRoutes";
 import { setupInventoryRoutes } from "./infrastructure/routes/inventoryRoutes";
 import { setupReviewRoutes } from "./infrastructure/routes/reviewRoutes";
-import { setupAIRoutes } from "./infrastructure/routes/aiRoutes";
-import { websocket } from "hono/bun";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
@@ -52,10 +49,18 @@ setupShipmentRoutes(app);
 setupReportRoutes(app);
 setupCartRoutes(app);
 setupUploadRoutes(app);
-setUpWebsocketRoute(app);
 setupInventoryRoutes(app);
 setupReviewRoutes(app);
-setupAIRoutes(app);
+
+// Health check
+app.get("/api/health", (c) => {
+  return c.json({
+    success: true,
+    status: "ok",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // 404 handler
 app.notFound((c) => {
@@ -85,5 +90,4 @@ app.onError((err, c) => {
 export default {
   fetch: app.fetch,
   port: 8080,
-  websocket,
 };

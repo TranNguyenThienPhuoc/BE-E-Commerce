@@ -1,8 +1,6 @@
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IUserUseCase } from "../../domain/usecases/IUserUseCase";
 import { IAuthUseCase } from "../../domain/usecases/IAuthUseCase";
-import { IWsUseCase } from "../../domain/usecases/IWsUseCase";
-import { IWsRepository } from "../../domain/repositories/IWsRepository";
 import { IProductRepository } from "../../domain/repositories/IProductRepository";
 import { ICategoryRepository } from "../../domain/repositories/ICategoryRepository";
 import { IOrderRepository } from "../../domain/repositories/IOrderRepository";
@@ -24,9 +22,7 @@ import { OrderRepository } from "@/adapters/repositories/OrderRepository";
 import { PaymentRepository } from "@/adapters/repositories/PaymentRepository";
 import { ShipmentRepository } from "@/adapters/repositories/ShipmentRepository";
 import { CartRepository } from "@/adapters/repositories/CartRepository";
-import { WsRepository } from "@/adapters/repositories/WsRepository";
 import { AuthUseCase } from "@/application/usecases/AuthUseCase";
-import { WsUseCase } from "@/application/usecases/WsUseCase";
 import { ProductUseCase } from "@/application/usecases/ProductUseCase";
 import { CategoryUseCase } from "@/application/usecases/CategoryUseCase";
 import { OrderUseCase } from "@/application/usecases/OrderUseCase";
@@ -72,10 +68,8 @@ export class Container {
   private inventoryRepository: IInventoryRepository;
   private reviewRepository: IReviewRepository;
   private productVariantRepository: IProductVariantRepository;
-  private wsRepository: IWsRepository;
   private userUseCase: IUserUseCase;
   private authUseCase: IAuthUseCase;
-  private wsUseCase: IWsUseCase;
   private productUseCase: IProductUseCase;
   private categoryUseCase: ICategoryUseCase;
   private orderUseCase: IOrderUseCase;
@@ -111,12 +105,10 @@ export class Container {
     this.inventoryRepository = new InventoryRepository();
     this.reviewRepository = new ReviewRepository();
     this.productVariantRepository = new ProductVariantRepository();
-    this.wsRepository = new WsRepository();
     this.s3Service = new S3Service();
 
     this.userUseCase = new UserUseCase(this.userRepository);
     this.authUseCase = new AuthUseCase(this.userRepository);
-    this.wsUseCase = new WsUseCase(this.wsRepository);
     this.productVariantUseCase = new ProductVariantUseCase(
       this.productVariantRepository,
       this.productRepository,
@@ -190,20 +182,12 @@ export class Container {
     return this.productRepository;
   }
 
-  getWsRepository(): IWsRepository {
-    return this.wsRepository;
-  }
-
   getUserController(): UserController {
     return this.userController;
   }
 
   getAuthController(): AuthController {
     return this.authController;
-  }
-
-  getWsUseCase(): IWsUseCase {
-    return this.wsUseCase;
   }
 
   getProductController(): ProductController {
