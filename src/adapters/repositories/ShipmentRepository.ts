@@ -14,7 +14,7 @@ export class ShipmentRepository extends BaseRepository implements IShipmentRepos
 
   constructor() {
     super();
-    this.tableName = process.env.DYNAMODB_TABLE_SHIPMENTS ?? process.env.DYNAMODB_TABLE_SHIPMENT ?? "Shipment";
+    this.tableName = process.env.DYNAMODB_TABLE_SHIPMENTS ?? process.env.DYNAMODB_TABLE_SHIPMENT ?? "shipment_table";
 
     if (!process.env.DYNAMODB_TABLE_SHIPMENTS && !process.env.DYNAMODB_TABLE_SHIPMENT) {
       console.warn(

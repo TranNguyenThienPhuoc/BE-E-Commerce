@@ -26,10 +26,10 @@ export class InventoryRepository extends BaseRepository implements IInventoryRep
 
   constructor() {
     super();
-    this.inventoryTable = DYNAMODB_TABLES.INVENTORY || "Inventory";
-    this.movementTable = DYNAMODB_TABLES.INVENTORY_MOVEMENT || "InventoryMovement";
-    this.productTable = DYNAMODB_TABLES.PRODUCT || "Product";
-    this.variantTable = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "Variant";
+    this.inventoryTable = DYNAMODB_TABLES.INVENTORY || "inventory_table";
+    this.movementTable = DYNAMODB_TABLES.INVENTORY_MOVEMENT || "inventory_movement_table";
+    this.productTable = DYNAMODB_TABLES.PRODUCT || "product_table";
+    this.variantTable = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "product_variant_table";
 
     if (!DYNAMODB_TABLES.INVENTORY) {
       console.warn(

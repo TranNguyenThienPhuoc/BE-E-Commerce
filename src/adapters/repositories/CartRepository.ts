@@ -20,10 +20,10 @@ export class CartRepository extends BaseRepository implements ICartRepository {
 
   constructor() {
     super()
-    this.cartTableName = process.env.DYNAMODB_TABLE_CARTS ?? process.env.DYNAMODB_TABLE_CART ?? "Cart";
-    this.productTableName = process.env.DYNAMODB_TABLE_PRODUCTS ?? process.env.DYNAMODB_TABLE_PRODUCT ?? "Product";
-    this.variantTableName = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "Variant";
-    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "Inventory";
+    this.cartTableName = process.env.DYNAMODB_TABLE_CARTS ?? process.env.DYNAMODB_TABLE_CART ?? "cart_item_table";
+    this.productTableName = process.env.DYNAMODB_TABLE_PRODUCTS ?? process.env.DYNAMODB_TABLE_PRODUCT ?? "product_table";
+    this.variantTableName = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "product_variant_table";
+    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "inventory_table";
     this.userIdIndex = process.env.DYNAMODB_CART_USER_ID_INDEX;
 
     if (!process.env.DYNAMODB_TABLE_CARTS && !process.env.DYNAMODB_TABLE_CART) {

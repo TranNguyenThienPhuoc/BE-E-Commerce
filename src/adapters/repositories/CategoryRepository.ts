@@ -16,7 +16,7 @@ export class CategoryRepository extends BaseRepository implements ICategoryRepos
 
   constructor() {
     super();
-    this.tableName = process.env.DYNAMODB_TABLE_CATEGORIES ?? process.env.DYNAMODB_TABLE_CATEGORY ?? "Category";
+    this.tableName = process.env.DYNAMODB_TABLE_CATEGORIES ?? process.env.DYNAMODB_TABLE_CATEGORY ?? "category_table";
     this.slugIndex = process.env.DYNAMODB_CATEGORIES_SLUG_INDEX;
 
     if (!process.env.DYNAMODB_TABLE_CATEGORIES && !process.env.DYNAMODB_TABLE_CATEGORY) {

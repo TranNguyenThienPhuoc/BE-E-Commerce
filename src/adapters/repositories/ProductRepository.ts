@@ -22,12 +22,12 @@ export class ProductRepository extends BaseRepository implements IProductReposit
 
   constructor() {
     super();
-    this.tableName = process.env.DYNAMODB_TABLE_PRODUCTS ?? process.env.DYNAMODB_TABLE_PRODUCT ?? "Product";
+    this.tableName = process.env.DYNAMODB_TABLE_PRODUCTS ?? process.env.DYNAMODB_TABLE_PRODUCT ?? "product_table";
     this.categoryIndex = process.env.DYNAMODB_PRODUCTS_CATEGORY_INDEX;
     this.statusIndex = process.env.DYNAMODB_PRODUCTS_STATUS_INDEX;
     this.sellerIndex = process.env.DYNAMODB_PRODUCTS_SELLER_INDEX;
-    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "Inventory";
-    this.variantTableName = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "Variant";
+    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "inventory_table";
+    this.variantTableName = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "product_variant_table";
 
     if (!process.env.DYNAMODB_TABLE_PRODUCTS && !process.env.DYNAMODB_TABLE_PRODUCT) {
       console.warn(

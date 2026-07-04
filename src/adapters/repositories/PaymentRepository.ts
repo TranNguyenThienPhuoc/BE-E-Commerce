@@ -14,7 +14,7 @@ export class PaymentRepository extends BaseRepository implements IPaymentReposit
 
   constructor() {
     super();
-    this.tableName = process.env.DYNAMODB_TABLE_PAYMENTS ?? process.env.DYNAMODB_TABLE_PAYMENT ?? "Payment";
+    this.tableName = process.env.DYNAMODB_TABLE_PAYMENTS ?? process.env.DYNAMODB_TABLE_PAYMENT ?? "payment_table";
 
     if (!process.env.DYNAMODB_TABLE_PAYMENTS && !process.env.DYNAMODB_TABLE_PAYMENT) {
       console.warn(

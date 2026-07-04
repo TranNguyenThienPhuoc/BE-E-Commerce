@@ -21,13 +21,13 @@ export class ProductVariantRepository extends BaseRepository implements IProduct
   constructor() {
     super();
     this.tableName =
-      process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "Variant";
+      process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "product_variant_table";
     this.productIdIndex =
       process.env.DYNAMODB_PRODUCT_VARIANTS_PRODUCT_ID_INDEX ??
       "ProductIdIndex";
     this.skuIndex =
       process.env.DYNAMODB_PRODUCT_VARIANTS_SKU_INDEX ?? "SkuIndex";
-    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "Inventory";
+    this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "inventory_table";
   }
 
   private itemToVariant(item: Record<string, unknown>): ProductVariant {

@@ -18,7 +18,7 @@ export class ReviewRepository extends BaseRepository implements IReviewRepositor
 
   constructor() {
     super();
-    this.tableName = DYNAMODB_TABLES.REVIEW || "Review";
+    this.tableName = DYNAMODB_TABLES.REVIEW || "review_table";
 
     if (!DYNAMODB_TABLES.REVIEW) {
       console.warn(

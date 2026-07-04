@@ -20,7 +20,7 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
 
   constructor() {
     super()
-    this.tableName = process.env.DYNAMODB_TABLE_ORDERS ?? process.env.DYNAMODB_TABLE_ORDER ?? "Order";
+    this.tableName = process.env.DYNAMODB_TABLE_ORDERS ?? process.env.DYNAMODB_TABLE_ORDER ?? "order_table";
     this.cartTableName = process.env.DYNAMODB_TABLE_CARTS ?? process.env.DYNAMODB_TABLE_CART ?? "Cart";
     this.customerIndex = process.env.DYNAMODB_ORDERS_CUSTOMER_INDEX;
     this.sellerIndex = process.env.DYNAMODB_ORDERS_SELLER_INDEX;

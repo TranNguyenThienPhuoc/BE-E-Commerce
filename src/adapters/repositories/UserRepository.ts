@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
 
   constructor() {
     super();
-    this.tableName = process.env.DYNAMODB_TABLE_USERS ?? process.env.DYNAMODB_TABLE_USER ?? "User";
+    this.tableName = process.env.DYNAMODB_TABLE_USERS ?? process.env.DYNAMODB_TABLE_USER ?? "users_table";
     this.emailIndex = process.env.DYNAMODB_USERS_EMAIL_INDEX;
 
     if (!process.env.DYNAMODB_TABLE_USERS && !process.env.DYNAMODB_TABLE_USER) {
