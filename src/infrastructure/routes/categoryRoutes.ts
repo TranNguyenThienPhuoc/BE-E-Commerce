@@ -3,22 +3,20 @@ import { Container } from "@/infrastructure/dependencies/Container";
 import { requireAuth, requireAdmin } from "@/infrastructure/middleware/auth";
 
 export function setupCategoryRoutes(app: Hono) {
-  app.use("/api/categories", requireAuth());
-  app.use("/api/categories/*", requireAuth());
 
   try {
     const container = Container.getInstance();
     const categoryController = container.getCategoryController();
 
-    app.post("/api/categories", requireAdmin(), (c) =>
+    app.post("/api/categories", requireAuth(), requireAdmin(), (c) =>
       categoryController.createCategory(c),
     );
     app.get("/api/categories", (c) => categoryController.listCategories(c));
     app.get("/api/categories/:id", (c) => categoryController.getCategory(c));
-    app.put("/api/categories/:id", requireAdmin(), (c) =>
+    app.put("/api/categories/:id", requireAuth(), requireAdmin(), (c) =>
       categoryController.updateCategory(c),
     );
-    app.delete("/api/categories/:id", requireAdmin(), (c) =>
+    app.delete("/api/categories/:id", requireAuth(), requireAdmin(), (c) =>
       categoryController.deleteCategory(c),
     );
   } catch (error) {

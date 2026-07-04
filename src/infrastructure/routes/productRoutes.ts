@@ -3,25 +3,23 @@ import { Container } from "@/infrastructure/dependencies/Container";
 import { requireAuth, requireAdmin } from "@/infrastructure/middleware/auth";
 
 export function setupProductRoutes(app: Hono) {
-  app.use("/api/products", requireAuth());
-  app.use("/api/products/*", requireAuth());
 
   const container = Container.getInstance();
   const productController = container.getProductController();
 
-  app.post("/api/products/upload-url", (c) =>
+  app.post("/api/products/upload-url", requireAuth(), (c) =>
     productController.generatePresignedUrl(c),
   );
-  app.post("/api/products/delete-image", (c) =>
+  app.post("/api/products/delete-image", requireAuth(), (c) =>
     productController.deleteImage(c),
   );
-  app.patch("/api/products/:id/approve", requireAdmin(), (c) =>
+  app.patch("/api/products/:id/approve", requireAuth(), requireAdmin(), (c) =>
     productController.approveProduct(c),
   );
-  app.post("/api/products", (c) => productController.createProduct(c));
-  app.get("/api/products/user", (c) => productController.listUserProducts(c));
+  app.post("/api/products", requireAuth(), (c) => productController.createProduct(c));
+  app.get("/api/products/user", requireAuth(), (c) => productController.listUserProducts(c));
   app.get("/api/products", (c) => productController.listProducts(c));
   app.get("/api/products/:id", (c) => productController.getProduct(c));
-  app.put("/api/products/:id", (c) => productController.updateProduct(c));
-  app.delete("/api/products/:id", (c) => productController.deleteProduct(c));
+  app.put("/api/products/:id", requireAuth(), (c) => productController.updateProduct(c));
+  app.delete("/api/products/:id", requireAuth(), (c) => productController.deleteProduct(c));
 }
