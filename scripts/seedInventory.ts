@@ -136,6 +136,7 @@ async function seedInventory() {
       reason: m.reason!,
       note: m.note,
       createdAt: m.createdAt!,
+      timestamp: new Date(m.createdAt!).getTime(),
     };
 
     return dynamoDBDocumentClient.send(

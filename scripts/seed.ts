@@ -19,9 +19,9 @@ async function runSeeds() {
     console.info("\n--- Seeding Reviews ---");
     await $`bun run scripts/seedReviews.ts`;
 
-    console.info("\n✅ All seeds completed successfully!");
+    console.info("\n All seeds completed successfully!");
   } catch (error) {
-    console.error("\n❌ Seeding failed:", error);
+    console.error("\n Seeding failed:", error);
     process.exit(1);
   }
 }

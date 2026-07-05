@@ -39,9 +39,9 @@ async function seedAdmin() {
       }),
     );
 
-    console.info("✅ Admin user seed complete.");
+    console.info(" Admin user seed complete.");
   } catch (error) {
-    console.error("❌ Failed to seed admin user:", error);
+    console.error(" Failed to seed admin user:", error);
     throw error;
   }
 }
