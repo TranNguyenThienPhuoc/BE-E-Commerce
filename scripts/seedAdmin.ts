@@ -3,7 +3,7 @@ import { dynamoDBDocumentClient } from "@/infrastructure/database";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 
-const TABLE_NAME = process.env.DYNAMODB_TABLE_USER ?? "User";
+const TABLE_NAME = process.env.DYNAMODB_TABLE_USER ?? "users_table";
 
 const adminData = {
   email: "admin@socialstore.com",

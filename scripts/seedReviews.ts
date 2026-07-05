@@ -3,7 +3,7 @@ import { dynamoDBDocumentClient, DYNAMODB_TABLES } from "@/infrastructure/databa
 import { Review } from "@/utils/schemas/review";
 import { randomUUID } from "crypto";
 
-const TABLE_NAME = DYNAMODB_TABLES.REVIEW || "Review";
+const TABLE_NAME = DYNAMODB_TABLES.REVIEW || "review_table";
 
 const sampleReviews: Array<Partial<Review>> = [
   {

@@ -3,7 +3,7 @@ import { dynamoDBDocumentClient } from "@/infrastructure/database";
 import { CreateCategoryInput } from "@/utils/schemas/category";
 import { randomUUID } from "crypto";
 
-const TABLE_NAME = process.env.DYNAMODB_TABLE_CATEGORIES ?? "Category";
+const TABLE_NAME = process.env.DYNAMODB_TABLE_CATEGORIES ?? "category_table";
 
 const sampleCategories: CreateCategoryInput[] = [
   {

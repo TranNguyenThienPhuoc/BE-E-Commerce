@@ -3,8 +3,8 @@ import { dynamoDBDocumentClient } from "@/infrastructure/database";
 import { InventoryItem, InventoryMovement } from "@/utils/schemas/inventory";
 import { randomUUID } from "crypto";
 
-const INVENTORY_TABLE = process.env.DYNAMODB_TABLE_INVENTORY ?? "Inventory";
-const MOVEMENT_TABLE = process.env.DYNAMODB_TABLE_INVENTORY_MOVEMENT ?? "InventoryMovement";
+const INVENTORY_TABLE = process.env.DYNAMODB_TABLE_INVENTORY ?? "inventory_table";
+const MOVEMENT_TABLE = process.env.DYNAMODB_TABLE_INVENTORY_MOVEMENT ?? "inventory_movement_table";
 
 const sampleInventory: Array<Partial<InventoryItem>> = [
   {

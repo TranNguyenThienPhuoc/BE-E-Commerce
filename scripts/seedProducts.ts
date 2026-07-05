@@ -3,7 +3,7 @@ import { dynamoDBDocumentClient } from "@/infrastructure/database";
 import { Product } from "@/utils/schemas/product";
 import { ProductVariant } from "@/utils/schemas/productVariant";
 
-const TABLE_NAME = process.env.DYNAMODB_TABLE_PRODUCTS ?? "Product";
+const TABLE_NAME = process.env.DYNAMODB_TABLE_PRODUCTS ?? "product_table";
 
 const sampleProducts: Array<Partial<Product>> = [
   {
