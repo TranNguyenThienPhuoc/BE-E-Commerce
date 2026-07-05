@@ -128,7 +128,7 @@ async function seedInventory() {
 
   console.info(`Seeding movements into table "${MOVEMENT_TABLE}"...`);
   const movementPromises = sampleMovements.map((m) => {
-    const fullMovement: InventoryMovement = {
+    const fullMovement = {
       id: m.id!,
       variantId: m.variantId!,
       type: m.type!,
