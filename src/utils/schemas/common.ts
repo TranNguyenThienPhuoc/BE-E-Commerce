@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 
-export const IDSchema = z.string().uuid('Invalid ID format');
+export const IDSchema = z.string().regex(/^[a-zA-Z0-9-]+$/, 'Invalid ID format');
 export const OptionalIDSchema = IDSchema.optional();
 
 

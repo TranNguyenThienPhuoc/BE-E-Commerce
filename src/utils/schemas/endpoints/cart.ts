@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { CartSchema, CartItemSchema } from "../cart";
+import { IDSchema } from "../common";
 
 export const AddToCartRequestSchema = z.object({
-  productId: z.string().uuid(),
-  variantId: z.string().uuid().optional(),
+  productId: IDSchema,
+  variantId: IDSchema.optional(),
   quantity: z.number().int().positive(),
 });
 
@@ -22,7 +23,7 @@ export const AddToCartResponseSchema = z.object({
 });
 
 export const GetCartRequestSchema = z.object({
-  userId: z.string().uuid(),
+  userId: IDSchema,
 });
 
 export const GetCartResponseSchema = z.object({
@@ -40,8 +41,8 @@ export const GetCartResponseSchema = z.object({
 });
 
 export const UpdateCartItemRequestSchema = z.object({
-  productId: z.string().uuid(),
-  variantId: z.string().uuid().optional(),
+  productId: IDSchema,
+  variantId: IDSchema.optional(),
   quantity: z.number().int().positive(),
 });
 
@@ -60,8 +61,8 @@ export const UpdateCartItemResponseSchema = z.object({
 });
 
 export const RemoveFromCartRequestSchema = z.object({
-  productId: z.string().uuid(),
-  variantId: z.string().uuid().optional(),
+  productId: IDSchema,
+  variantId: IDSchema.optional(),
 });
 
 export const RemoveFromCartResponseSchema = z.object({
@@ -79,7 +80,7 @@ export const RemoveFromCartResponseSchema = z.object({
 });
 
 export const ClearCartRequestSchema = z.object({
-  userId: z.string().uuid(),
+  userId: IDSchema,
 });
 
 export const ClearCartResponseSchema = z.object({
