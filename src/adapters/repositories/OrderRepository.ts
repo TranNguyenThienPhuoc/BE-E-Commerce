@@ -37,6 +37,7 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
     return {
       id: (item.id || item.Id) as string,
       customerId: item.customerId as string,
+      customerEmail: item.customerEmail as string,
       sellerId: item.sellerId as string,
       cartId: item.cartId as string,
       items: item.items as OrderItem[],

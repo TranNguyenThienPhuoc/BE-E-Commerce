@@ -10,7 +10,7 @@ import {
 import { SalesReportQuery, SalesReportResponse } from "@/utils/schemas/endpoints/reports";
 
 export interface IOrderUseCase {
-  checkout(userId: string, input: CheckoutRequest): Promise<CheckoutResponse>;
+  checkout(userId: string, input: CheckoutRequest, customerEmail: string): Promise<CheckoutResponse>;
   createOrder(input: CreateOrderInput): Promise<CreateOrderResponse>;
   getOrder(id: string, userId: string, role: string): Promise<GetOrderResponse>;
   listCustomerOrders(customerId: string): Promise<ListOrdersResponse>;

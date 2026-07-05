@@ -33,7 +33,7 @@ export class OrderUseCase implements IOrderUseCase {
     private paymentUseCase: IPaymentUseCase,
   ) {}
 
-  async checkout(userId: string, input: CheckoutRequest): Promise<CheckoutResponse> {
+  async checkout(userId: string, input: CheckoutRequest, customerEmail: string): Promise<CheckoutResponse> {
     try {
       const cart = await this.cartRepository.findById(input.cartId);
       if (!cart || cart.userId !== userId) {
@@ -76,6 +76,7 @@ export class OrderUseCase implements IOrderUseCase {
         const order = new OrderEntity(
           crypto.randomUUID(),
           userId,
+          customerEmail,
           sellerId,
           input.cartId,
           items,
@@ -126,6 +127,7 @@ export class OrderUseCase implements IOrderUseCase {
       const order = new OrderEntity(
         crypto.randomUUID(),
         input.customerId,
+        input.customerEmail,
         input.sellerId,
         input.cartId,
         input.items,

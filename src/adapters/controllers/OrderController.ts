@@ -10,12 +10,13 @@ export class OrderController {
   async checkout(c: Context) {
     try {
       const userId = c.get("userId") as string;
-      if (!userId) {
-        return c.json(StatusBuilder.fail("Unauthorized: User ID not found"), 401);
+      const user = c.get("user") as { id: string; email: string } | undefined;
+      if (!userId || !user) {
+        return c.json(StatusBuilder.fail("Unauthorized: User not found"), 401);
       }
 
       const body = (await c.req.json()) as CheckoutRequest;
-      const response = await this.orderUseCase.checkout(userId, body);
+      const response = await this.orderUseCase.checkout(userId, body, user.email);
 
       if (response.success) {
         return c.json(response, 201);
@@ -34,15 +35,17 @@ export class OrderController {
   async createOrder(c: Context) {
     try {
       const userId = c.get("userId") as string;
-      if (!userId) {
-        return c.json(StatusBuilder.fail("Unauthorized: User ID not found"), 401);
+      const user = c.get("user") as { id: string; email: string } | undefined;
+      if (!userId || !user) {
+        return c.json(StatusBuilder.fail("Unauthorized: User not found"), 401);
       }
 
-      const body = await c.req.json() as Omit<CreateOrderInput, "customerId">;
+      const body = await c.req.json() as Omit<CreateOrderInput, "customerId" | "customerEmail">;
       
       const input: CreateOrderInput = {
         ...body,
         customerId: userId,
+        customerEmail: user.email,
       };
 
       const response = await this.orderUseCase.createOrder(input);

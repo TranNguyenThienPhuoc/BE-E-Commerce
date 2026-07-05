@@ -12,6 +12,7 @@ import {
 export class OrderEntity implements Order {
   private idValue: string;
   private customerIdValue: string;
+  private customerEmailValue: string;
   private sellerIdValue: string;
   private cartIdValue: string;
   private itemsValue: OrderItem[];
@@ -26,6 +27,7 @@ export class OrderEntity implements Order {
   constructor(
     id: string,
     customerId: string,
+    customerEmail: string,
     sellerId: string,
     cartId: string,
     items: OrderItem[],
@@ -39,6 +41,7 @@ export class OrderEntity implements Order {
   ) {
     this.idValue = id;
     this.customerIdValue = customerId;
+    this.customerEmailValue = customerEmail;
     this.sellerIdValue = sellerId;
     this.cartIdValue = cartId;
     this.itemsValue = items;
@@ -57,6 +60,10 @@ export class OrderEntity implements Order {
 
   get customerId(): string {
     return this.customerIdValue;
+  }
+
+  get customerEmail(): string {
+    return this.customerEmailValue;
   }
 
   get sellerId(): string {
@@ -139,6 +146,7 @@ export class OrderEntity implements Order {
     return {
       id: this.idValue,
       customerId: this.customerIdValue,
+      customerEmail: this.customerEmailValue,
       sellerId: this.sellerIdValue,
       cartId: this.cartIdValue,
       items: this.itemsValue,
@@ -156,6 +164,7 @@ export class OrderEntity implements Order {
     return new OrderEntity(
       data.id,
       data.customerId,
+      data.customerEmail,
       data.sellerId,
       data.cartId,
       data.items,
