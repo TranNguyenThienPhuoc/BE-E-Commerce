@@ -156,7 +156,7 @@ export class UserRepository extends BaseRepository implements IUserRepository {
     const cartTableName =
       process.env.DYNAMODB_TABLE_CARTS ??
       process.env.DYNAMODB_TABLE_CART ??
-      "Cart";
+      "cart_item_table";
     const cartItem = this.prepareItem(cart);
 
     const transactItems = [

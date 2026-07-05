@@ -37,7 +37,7 @@ export const PasswordSchema = z.string()
 export const NameSchema = z.string()
   .min(2, 'Name must be at least 2 characters long')
   .max(100, 'Name must be less than 100 characters long')
-  .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes')
+  .regex(/^[\p{L}\s'-]+$/u, 'Name can only contain letters, spaces, hyphens, and apostrophes')
   .refine(
     (name) => name.trim() === name,
     'Name cannot have leading or trailing whitespace'
