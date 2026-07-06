@@ -12,6 +12,7 @@ import { setupCartRoutes } from "./infrastructure/routes/cartRoutes";
 import { setupUploadRoutes } from "./infrastructure/routes/uploadRoutes";
 import { setupInventoryRoutes } from "./infrastructure/routes/inventoryRoutes";
 import { setupReviewRoutes } from "./infrastructure/routes/reviewRoutes";
+import { setupWishlistRoutes } from "./infrastructure/routes/wishlistRoutes";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { loadSecrets } from "./config";
@@ -55,6 +56,7 @@ setupCartRoutes(app);
 setupUploadRoutes(app);
 setupInventoryRoutes(app);
 setupReviewRoutes(app);
+setupWishlistRoutes(app);
 
 // Initialize Background Workers
 import { Container } from "./infrastructure/dependencies/Container";

@@ -18,6 +18,7 @@ export class UserEntity implements User {
   private nameValue: string;
   private passwordValue: string;
   private roleValue: UserRole;
+  private favoritesValue: string[];
   private createdAtValue: Date;
   private updatedAtValue: Date;
 
@@ -27,6 +28,7 @@ export class UserEntity implements User {
     name: string,
     password: string,
     role: UserRole = 'customer',
+    favorites: string[] = [],
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ) {
@@ -35,6 +37,7 @@ export class UserEntity implements User {
     this.nameValue = name;
     this.passwordValue = password;
     this.roleValue = role;
+    this.favoritesValue = favorites;
     this.createdAtValue = createdAt;
     this.updatedAtValue = updatedAt;
 
@@ -71,6 +74,10 @@ export class UserEntity implements User {
     return this.roleValue;
   }
 
+  get favorites(): string[] {
+    return this.favoritesValue;
+  }
+
   get createdAt(): Date {
     return this.createdAtValue;
   }
@@ -100,6 +107,11 @@ export class UserEntity implements User {
     this.updatedAtValue = new Date();
   }
 
+  set favorites(value: string[]) {
+    this.favoritesValue = value;
+    this.updatedAtValue = new Date();
+  }
+
   static fromValidatedData(data: User): UserEntity {
     return new UserEntity(
       data.id,
@@ -107,8 +119,9 @@ export class UserEntity implements User {
       data.name,
       data.password,
       data.role,
-      data.createdAt,
-      data.updatedAt,
+      data.favorites || [],
+      data.createdAt ? new Date(data.createdAt) : new Date(),
+      data.updatedAt ? new Date(data.updatedAt) : new Date(),
     );
   }
 
@@ -161,6 +174,7 @@ export class UserEntity implements User {
       name: this.name,
       password: this.password,
       role: this.role,
+      favorites: this.favorites,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

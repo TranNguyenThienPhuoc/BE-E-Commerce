@@ -32,7 +32,8 @@ export class UserRepository extends BaseRepository implements IUserRepository {
       email: item.email as string,
       name: item.name as string,
       password: item.password as string,
-      role: (item.role as UserRole) || "customer", 
+      role: (item.role as UserRole) || "customer",
+      favorites: (item.favorites as string[]) || [],
       createdAt: item.createdAt ? new Date(item.createdAt as string) : new Date(),
       updatedAt: item.updatedAt ? new Date(item.updatedAt as string) : new Date(),
     };
@@ -88,7 +89,14 @@ export class UserRepository extends BaseRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const item = this.prepareItem(user);
+    const item = {
+        ...user,
+        password: user.password,
+        role: user.role,
+        favorites: user.favorites,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+    };
 
     await dynamoDBDocumentClient.send(
       new PutCommand({

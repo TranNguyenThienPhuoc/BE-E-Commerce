@@ -56,6 +56,9 @@ import { UploadUseCase } from "@/application/usecases/UploadUseCase";
 import { UploadController } from "@/adapters/controllers/UploadController";
 import { UserUseCase } from "@/application/usecases/UserUseCase";
 import { RedisService } from "@/infrastructure/cache/RedisService";
+import { IWishlistUseCase } from "@/domain/usecases/IWishlistUseCase";
+import { WishlistUseCase } from "@/application/usecases/WishlistUseCase";
+import { WishlistController } from "@/interfaces/controllers/WishlistController";
 
 export class Container {
   private static instance: Container;
@@ -93,6 +96,8 @@ export class Container {
   private reviewController: ReviewController;
   private productVariantController: ProductVariantController;
   private uploadController: UploadController;
+  private wishlistUseCase: IWishlistUseCase;
+  private wishlistController: WishlistController;
   private s3Service: S3Service;
   private redisService: RedisService;
 
@@ -154,6 +159,10 @@ export class Container {
     );
 
     this.uploadUseCase = new UploadUseCase(this.s3Service);
+    this.wishlistUseCase = new WishlistUseCase(
+      this.userRepository,
+      this.productRepository
+    );
 
     this.userController = new UserController(this.userUseCase);
     this.authController = new AuthController(this.authUseCase);
@@ -169,6 +178,7 @@ export class Container {
       this.productVariantUseCase,
     );
     this.uploadController = new UploadController(this.uploadUseCase);
+    this.wishlistController = new WishlistController(this.wishlistUseCase);
   }
 
   static getInstance(): Container {
@@ -232,6 +242,10 @@ export class Container {
 
   getUploadController(): UploadController {
     return this.uploadController;
+  }
+
+  public getWishlistController(): WishlistController {
+    return this.wishlistController;
   }
 
   getProductUseCase(): IProductUseCase {

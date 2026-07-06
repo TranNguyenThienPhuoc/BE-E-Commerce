@@ -18,6 +18,7 @@ export const UserSchema = z.object({
   name: NameSchema,
   password: PasswordSchema,
   role: UserRoleSchema,
+  favorites: z.array(z.string()).default([]),
 }).refine(...entityDateRefinement);
 
 /**
@@ -28,6 +29,7 @@ export const CreateUserSchema = z.object({
   name: NameSchema,
   password: PasswordSchema,
   role: UserRoleSchema.optional(),
+  favorites: z.array(z.string()).optional(),
 });
 
 /**
@@ -38,6 +40,7 @@ export const UpdateUserSchema = z.object({
   email: EmailSchema.optional(),
   password: PasswordSchema.optional(),
   role: UserRoleSchema.optional(),
+  favorites: z.array(z.string()).optional(),
 }).refine(...atLeastOneFieldRefinement);
 
 /**
@@ -48,6 +51,7 @@ export const UserInputSchema = z.object({
   name: NameSchema,
   password: PasswordSchema,
   role: UserRoleSchema.optional(),
+  favorites: z.array(z.string()).optional(),
 }).strict();
 
 /**
@@ -58,6 +62,7 @@ export const SanitizedUserInputSchema = UserInputSchema.transform((data) => ({
   name: data.name.trim(),
   password: data.password,
   role: data.role,
+  favorites: data.favorites,
 }));
 
 /**
