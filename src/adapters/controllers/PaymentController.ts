@@ -119,4 +119,50 @@ export class PaymentController {
       );
     }
   }
+
+
+
+  async createPayosPaymentUrl(c: Context) {
+    try {
+      const { orderId } = await c.req.json();
+      const userId = c.get("userId");
+
+      if (!orderId) {
+        return c.json(StatusBuilder.fail("orderId is required"), 400);
+      }
+
+      const response = await this.paymentUseCase.createPayosPaymentUrl(orderId, userId);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      return c.json(
+        StatusBuilder.fail(err.message || "Internal Server Error"),
+        500
+      );
+    }
+  }
+
+  async payosWebhook(c: Context) {
+    try {
+      const body = await c.req.json();
+      const response = await this.paymentUseCase.payosWebhook(body);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      return c.json(
+        StatusBuilder.fail(err.message || "Internal Server Error"),
+        500
+      );
+    }
+  }
 }

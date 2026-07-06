@@ -44,6 +44,10 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
       totalAmount: item.totalAmount as number,
       status: item.status as OrderStatus,
       paymentStatus: item.paymentStatus as PaymentStatus,
+      paymentProvider: item.paymentProvider as string | undefined,
+      stripeSessionId: item.stripeSessionId as string | undefined,
+      paymentIntentId: item.paymentIntentId as string | undefined,
+      paidAt: item.paidAt as string | undefined,
       shippingAddress: item.shippingAddress as string,
       notes: item.notes as string | undefined,
       createdAt: item.createdAt ? new Date(item.createdAt as string) : new Date(),
@@ -98,6 +102,20 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
     } while (ExclusiveStartKey);
 
     return this.mapItems(items);
+  }
+
+  async findByPaymentIntentId(intentId: string): Promise<Order | null> {
+    const cmd = new ScanCommand({
+      TableName: this.tableName,
+      FilterExpression: "paymentIntentId = :intentId",
+      ExpressionAttributeValues: {
+        ":intentId": intentId,
+      },
+    });
+
+    const res = await dynamoDBDocumentClient.send(cmd);
+    if (!res.Items || res.Items.length === 0) return null;
+    return this.itemToOrder(res.Items[0]);
   }
 
   async findByCustomerId(customerId: string): Promise<Order[]> {

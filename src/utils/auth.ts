@@ -14,9 +14,9 @@ export interface DecodedAccessToken {
   exp?: number;
 }
 
-export const DEFAULT_ACCESS_TOKEN_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+import { config } from "../config";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+export const DEFAULT_ACCESS_TOKEN_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Generate a JWT access token containing userId and role.
@@ -25,7 +25,7 @@ export function generateAccessToken(userId: string, role: UserRole): string {
   const expiresInSeconds = Math.floor(DEFAULT_ACCESS_TOKEN_MAX_AGE_MS / 1000);
   return jwt.sign(
     { sub: userId, role }, 
-    JWT_SECRET, 
+    config.jwtSecret, 
     { expiresIn: expiresInSeconds }
   );
 }
@@ -71,7 +71,7 @@ export function verifyAccessToken(
   }
 
   try {
-    const rawPayload = jwt.verify(token, JWT_SECRET, verifyOpts);
+    const rawPayload = jwt.verify(token, config.jwtSecret, verifyOpts);
 
     if (typeof rawPayload === "string") {
       return { valid: false, reason: "Invalid token payload" };

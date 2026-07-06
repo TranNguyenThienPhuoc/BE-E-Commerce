@@ -1,8 +1,10 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+import { config } from "@/config";
+
 const REGION = process.env.AWS_REGION ?? "ap-southeast-1";
-const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+const BUCKET_NAME = config.s3MediaBucket;
 
 /**
  * S3 Client configuration.

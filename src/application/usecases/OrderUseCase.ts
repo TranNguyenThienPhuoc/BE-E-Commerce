@@ -84,6 +84,10 @@ export class OrderUseCase implements IOrderUseCase {
           input.shippingAddress,
           "pending",
           "pending",
+          undefined,
+          undefined,
+          undefined,
+          undefined,
           input.notes,
           new Date(),
           new Date(),
@@ -96,13 +100,16 @@ export class OrderUseCase implements IOrderUseCase {
         cart.id,
       );
 
+      const { sqsService } = require("@/infrastructure/aws/sqsClient");
+      
       for (const order of createdOrders) {
-        await this.paymentUseCase.createPayment({
+        // Send order to SQS instead of processing payment directly
+        await sqsService.sendMessage({
           orderId: order.id,
           amount: order.totalAmount,
           method: input.paymentMethod,
           notes: input.notes,
-        });
+        }, order.id);
       }
 
       return StatusBuilder.ok(createdOrders[0]);
@@ -135,6 +142,10 @@ export class OrderUseCase implements IOrderUseCase {
         input.shippingAddress,
         "pending",
         "pending",
+        undefined,
+        undefined,
+        undefined,
+        undefined,
         input.notes,
         new Date(),
         new Date(),
@@ -219,6 +230,12 @@ export class OrderUseCase implements IOrderUseCase {
       order.status = status;
 
       const savedOrder = await this.orderRepository.save(order.toJSON());
+      
+      if (status === "delivered") {
+        const { eventBus, EVENTS } = require("@/infrastructure/events/eventBus");
+        eventBus.emit(EVENTS.ORDER_DELIVERED, savedOrder.id);
+      }
+      
       return StatusBuilder.ok(savedOrder);
     } catch (error) {
       return StatusBuilder.fail(
@@ -252,6 +269,10 @@ export class OrderUseCase implements IOrderUseCase {
 
       order.status = "cancelled";
       const savedOrder = await this.orderRepository.save(order.toJSON());
+      
+      const { eventBus, EVENTS } = require("@/infrastructure/events/eventBus");
+      eventBus.emit(EVENTS.ORDER_CANCELLED, savedOrder.id);
+      
       return StatusBuilder.ok(savedOrder);
     } catch (error) {
       return StatusBuilder.fail(

@@ -39,6 +39,8 @@ import {
   DomainValidationError,
 } from "@/domain/entities/Product";
 
+import { RedisService } from "@/infrastructure/cache/RedisService";
+
 const normalizeCategorySlug = (value: string): string =>
   value
     .trim()
@@ -56,6 +58,7 @@ export class ProductUseCase implements IProductUseCase {
     private categoryRepository: ICategoryRepository,
     private inventoryRepository: IInventoryRepository,
     private variantUseCase: IProductVariantUseCase,
+    private redisService: RedisService,
   ) {}
 
   async createProduct(
@@ -146,6 +149,8 @@ export class ProductUseCase implements IProductUseCase {
           variantsWithInventory,
         );
 
+      await this.redisService.delPattern('products:*');
+
       return StatusBuilder.ok(savedProduct);
     } catch (error: unknown) {
       return this.handleError(error);
@@ -161,7 +166,16 @@ export class ProductUseCase implements IProductUseCase {
       const validatedParams = validateData(ProductIdParamSchema, {
         id: request.id,
       });
-      const product = await this.productRepository.findById(validatedParams.id);
+      
+      const cacheKey = `products:detail:${validatedParams.id}`;
+      let product = await this.redisService.get<Product>(cacheKey);
+
+      if (!product) {
+        product = await this.productRepository.findById(validatedParams.id);
+        if (product) {
+          await this.redisService.set(cacheKey, product, 300); // 5 mins
+        }
+      }
 
       if (!product) {
         return StatusBuilder.fail("Product not found", [
@@ -229,6 +243,7 @@ export class ProductUseCase implements IProductUseCase {
       const savedProduct = await this.productRepository.save(
         updatedProduct.toJSON(),
       );
+      await this.redisService.delPattern('products:*');
       return StatusBuilder.ok(savedProduct);
     } catch (error) {
       return this.handleError(error);
@@ -273,6 +288,9 @@ export class ProductUseCase implements IProductUseCase {
       );
 
       if (!deleted) return StatusBuilder.fail("Failed to delete product");
+      
+      await this.redisService.delPattern('products:*');
+      
       return StatusBuilder.ok(undefined);
     } catch (error) {
       return this.handleError(error);
@@ -289,6 +307,15 @@ export class ProductUseCase implements IProductUseCase {
       const limit = request.limit || 10;
       const skip = (page - 1) * limit;
 
+      // 1. Tạo cache key dựa trên tham số query
+      const cacheKey = `products:list:${page}:${limit}:${request.category || 'all'}:${request.status || 'all'}:${request.search || 'none'}:${request.sortBy || 'none'}:${request.sortOrder || 'none'}:${role === 'admin' ? 'admin' : 'user'}`;
+      
+      // 2. Thử đọc từ Redis
+      const cachedData = await this.redisService.get<any>(cacheKey);
+      if (cachedData) {
+        return StatusBuilder.paginated(cachedData.products, cachedData.meta);
+      }
+
       const categoryFilter = await this.resolveCategoryFilter(request.category);
       const products = await this.productRepository.list({
         category: categoryFilter,
@@ -303,12 +330,17 @@ export class ProductUseCase implements IProductUseCase {
       const paginatedProducts = products.slice(skip, skip + limit);
       const totalPages = Math.ceil(total / limit);
 
-      return StatusBuilder.paginated(paginatedProducts, {
+      const meta = {
         page,
         limit,
         total,
         totalPages,
-      });
+      };
+
+      // 3. Lưu kết quả vào Redis (Cache TTL: 5 phút)
+      await this.redisService.set(cacheKey, { products: paginatedProducts, meta }, 300);
+
+      return StatusBuilder.paginated(paginatedProducts, meta);
     } catch (error) {
       return this.handleError(error);
     }
@@ -384,6 +416,7 @@ export class ProductUseCase implements IProductUseCase {
       const savedProduct = await this.productRepository.save(
         updatedProduct.toJSON(),
       );
+      await this.redisService.delPattern('products:*');
       return StatusBuilder.ok(savedProduct);
     } catch (error) {
       return this.handleError(error);

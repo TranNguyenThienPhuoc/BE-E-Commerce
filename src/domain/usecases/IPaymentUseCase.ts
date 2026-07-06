@@ -12,4 +12,6 @@ export interface IPaymentUseCase {
   updatePayment(id: string, input: UpdatePaymentInput): Promise<ApiResponse<Payment>>;
   processPayment(id: string): Promise<ApiResponse<Payment>>;
   listAllPayments(): Promise<ApiResponse<Payment[]>>;
+  createPayosPaymentUrl(orderId: string, userId: string): Promise<ApiResponse<{ checkoutUrl: string }>>;
+  payosWebhook(body: any): Promise<ApiResponse<any>>;
 }

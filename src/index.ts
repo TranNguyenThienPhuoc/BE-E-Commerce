@@ -12,8 +12,13 @@ import { setupCartRoutes } from "./infrastructure/routes/cartRoutes";
 import { setupUploadRoutes } from "./infrastructure/routes/uploadRoutes";
 import { setupInventoryRoutes } from "./infrastructure/routes/inventoryRoutes";
 import { setupReviewRoutes } from "./infrastructure/routes/reviewRoutes";
+import { setupSettlementRoutes } from "./infrastructure/routes/settlementRoutes";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { loadSecrets } from "./config";
+
+// Load AWS Secrets before starting the app
+await loadSecrets();
 
 const app = new Hono();
 
@@ -51,6 +56,19 @@ setupCartRoutes(app);
 setupUploadRoutes(app);
 setupInventoryRoutes(app);
 setupReviewRoutes(app);
+setupSettlementRoutes(app);
+
+// Initialize Background Workers
+import { Container } from "./infrastructure/dependencies/Container";
+import { initializeSQSWorker } from "./infrastructure/sqsWorker";
+const container = Container.getInstance();
+// We temporarily cast to any because we need the private paymentUseCase or add a getter for it. 
+// Actually, let's just add getPaymentUseCase to Container instead.
+// For now, let's use any if not available.
+const paymentUseCase = (container as any).paymentUseCase;
+if (paymentUseCase) {
+  initializeSQSWorker(paymentUseCase);
+}
 
 // Health check
 app.get("/api/health", (c) => {

@@ -15,4 +15,7 @@ export const setupPaymentRoutes = (app: Hono) => {
   app.get("/api/payments/order/:orderId", (c) => paymentController.getPaymentsByOrder(c));
   app.patch("/api/payments/:id", (c) => paymentController.updatePayment(c));
   app.post("/api/payments/:id/process", (c) => paymentController.processPayment(c));
+  
+  app.post("/api/payments/payos/create", (c) => paymentController.createPayosPaymentUrl(c));
+  app.post("/api/payments/payos/webhook", (c) => paymentController.payosWebhook(c));
 };

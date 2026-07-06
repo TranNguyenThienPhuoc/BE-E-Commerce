@@ -55,6 +55,7 @@ import { IUploadUseCase } from "@/domain/usecases/IUploadUseCase";
 import { UploadUseCase } from "@/application/usecases/UploadUseCase";
 import { UploadController } from "@/adapters/controllers/UploadController";
 import { UserUseCase } from "@/application/usecases/UserUseCase";
+import { RedisService } from "@/infrastructure/cache/RedisService";
 
 export class Container {
   private static instance: Container;
@@ -93,6 +94,7 @@ export class Container {
   private productVariantController: ProductVariantController;
   private uploadController: UploadController;
   private s3Service: S3Service;
+  private redisService: RedisService;
 
   private constructor() {
     this.userRepository = new UserRepository();
@@ -106,6 +108,7 @@ export class Container {
     this.reviewRepository = new ReviewRepository();
     this.productVariantRepository = new ProductVariantRepository();
     this.s3Service = new S3Service();
+    this.redisService = new RedisService();
 
     this.userUseCase = new UserUseCase(this.userRepository);
     this.authUseCase = new AuthUseCase(this.userRepository);
@@ -120,6 +123,7 @@ export class Container {
       this.categoryRepository,
       this.inventoryRepository,
       this.productVariantUseCase,
+      this.redisService,
     );
     this.categoryUseCase = new CategoryUseCase(
       this.categoryRepository,

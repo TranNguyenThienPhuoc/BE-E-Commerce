@@ -12,6 +12,15 @@ import {
   CreatePaymentInput,
   UpdatePaymentInput,
 } from "@/utils/schemas/payment";
+import { eventBus, EVENTS } from "@/infrastructure/events/eventBus";
+import { config } from "@/config";
+import { PayOS } from "@payos/node";
+
+const payos = new PayOS({
+  clientId: config.payosClientId,
+  apiKey: config.payosApiKey,
+  checksumKey: config.payosChecksumKey
+});
 
 export class PaymentUseCase implements IPaymentUseCase {
   constructor(
@@ -156,17 +165,91 @@ export class PaymentUseCase implements IPaymentUseCase {
     }
   }
 
-  private async updateOrderPaymentStatus(orderId: string): Promise<void> {
-    const orderData = await this.orderRepository.findById(orderId);
-    if (orderData) {
-      const order = OrderEntity.fromValidatedData(orderData);
-      order.paymentStatus = "paid";
-      
-      if (order.status === "pending") {
-        order.status = "confirmed";
+
+
+  async createPayosPaymentUrl(orderId: string, userId: string): Promise<ApiResponse<{ checkoutUrl: string }>> {
+    try {
+      const orderData = await this.orderRepository.findById(orderId);
+      if (!orderData) {
+        return StatusBuilder.fail("Order not found");
       }
+
+      if (orderData.customerId !== userId) {
+        return StatusBuilder.fail("Unauthorized: Order does not belong to user");
+      }
+
+      if (orderData.paymentStatus === "paid") {
+        return StatusBuilder.fail("Order is already paid");
+      }
+
+      // Generate a numeric orderCode (timestamp last 6 digits + 3 random digits)
+      const orderCode = Number(String(Date.now()).slice(-6) + Math.floor(Math.random() * 1000));
       
+      const paymentData = {
+        orderCode: orderCode,
+        amount: orderData.totalAmount,
+        description: `Thanh toan don ${orderCode}`,
+        cancelUrl: `${config.frontendUrl}/checkout/cancel`,
+        returnUrl: `${config.frontendUrl}/checkout/success?order_id=${orderId}`,
+      };
+
+      const paymentLink = await payos.paymentRequests.create(paymentData);
+      
+      if (!paymentLink.checkoutUrl) {
+        return StatusBuilder.fail("Failed to create PayOS session URL");
+      }
+
+      // We need to save the orderCode to DynamoDB so we can find it when the webhook fires
+      // We will store it as a string in paymentIntentId
+      const order = OrderEntity.fromValidatedData(orderData);
+      order.paymentIntentId = String(orderCode);
+      order.paymentProvider = "payos";
       await this.orderRepository.save(order.toJSON());
+
+      return StatusBuilder.ok({ checkoutUrl: paymentLink.checkoutUrl });
+    } catch (error) {
+      console.error("PayOS session creation error:", error);
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
     }
   }
+
+  async payosWebhook(body: any): Promise<ApiResponse<any>> {
+    try {
+      // Verify webhook data
+      const webhookData = await payos.webhooks.verify(body);
+
+      if (webhookData.code === "00" || webhookData.code === "success") {
+        // Payment successful
+        const orderCode = webhookData.orderCode;
+        
+        // Find order by paymentIntentId (which stores the orderCode)
+        const orderData = await (this.orderRepository as any).findByPaymentIntentId(String(orderCode));
+        
+        if (orderData && orderData.paymentStatus !== "paid") {
+          const order = OrderEntity.fromValidatedData(orderData);
+          order.paymentStatus = "paid";
+          order.paidAt = new Date().toISOString();
+          
+          if (order.status === "pending") {
+            order.status = "confirmed";
+          }
+          await this.orderRepository.save(order.toJSON());
+
+          // Publish Event
+          eventBus.emit(EVENTS.ORDER_PAID, order.id);
+        }
+      }
+
+      return StatusBuilder.ok({ received: true });
+    } catch (error) {
+      console.error("PayOS webhook error:", error);
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
+    }
+  }
+
+
 }

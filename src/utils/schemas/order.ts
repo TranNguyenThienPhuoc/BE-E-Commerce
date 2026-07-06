@@ -42,6 +42,10 @@ export const OrderSchema = z.object({
   totalAmount: PositiveNumberSchema,
   status: OrderStatusSchema.default('pending'),
   paymentStatus: PaymentStatusSchema.default('pending'),
+  paymentProvider: z.string().optional(),
+  stripeSessionId: z.string().optional(),
+  paymentIntentId: z.string().optional(),
+  paidAt: z.string().datetime().optional(),
   shippingAddress: NonEmptyStringSchema,
   notes: z.string().max(500).optional(),
 }).refine(...entityDateRefinement);
