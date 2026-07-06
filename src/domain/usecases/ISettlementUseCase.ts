@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/utils/schemas/api";
+import { ApiResponse } from "@/utils";
 import { WalletTransaction, WithdrawalRequest, SellerWallet } from "@/utils/schemas/settlement";
 
 export interface ISettlementUseCase {

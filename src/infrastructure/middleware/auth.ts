@@ -94,6 +94,26 @@ export function requireAdmin() {
 }
 
 /**
+ * Middleware to restrict access to specific roles.
+ * Must be used after requireAuth().
+ */
+export function requireRoles(allowedRoles: UserRole[]) {
+  return async (c: Context, next: Next) => {
+    const user = c.get("user");
+    const role = c.get("role") as UserRole | undefined;
+
+    if (!user || !role || !allowedRoles.includes(role)) {
+      return c.json(
+        StatusBuilder.fail(`Forbidden: One of these roles is required: ${allowedRoles.join(', ')}`),
+        403,
+      );
+    }
+
+    await next();
+  };
+}
+
+/**
  * Helper to read the authenticated user from the context (if present).
  * Returns `null` when no authenticated user exists on the context.
  */

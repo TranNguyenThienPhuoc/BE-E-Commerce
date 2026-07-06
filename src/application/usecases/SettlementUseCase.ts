@@ -4,7 +4,7 @@ import { IOrderRepository } from "@/domain/repositories/IOrderRepository";
 import { WalletRepository } from "@/adapters/repositories/WalletRepository";
 import { WalletTransactionRepository } from "@/adapters/repositories/WalletTransactionRepository";
 import { WithdrawalRepository } from "@/adapters/repositories/WithdrawalRepository";
-import { ApiResponse, StatusBuilder } from "@/utils/schemas/api";
+import { ApiResponse, StatusBuilder } from "@/utils";
 import { WalletTransaction, WithdrawalRequest, SellerWallet } from "@/utils/schemas/settlement";
 
 export class SettlementUseCase implements ISettlementUseCase {

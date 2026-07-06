@@ -5,7 +5,7 @@ import { WalletRepository } from "@/adapters/repositories/WalletRepository";
 import { WalletTransactionRepository } from "@/adapters/repositories/WalletTransactionRepository";
 import { WithdrawalRepository } from "@/adapters/repositories/WithdrawalRepository";
 import { OrderRepository } from "@/adapters/repositories/OrderRepository";
-import { authMiddleware, roleMiddleware } from "@/infrastructure/middlewares/auth";
+import { requireAuth, requireRoles } from "@/infrastructure/middleware/auth";
 import { initializeSettlementWorker } from "@/infrastructure/events/settlementWorker";
 
 const orderRepository = new OrderRepository();
@@ -29,7 +29,7 @@ export function setupSettlementRoutes(app: Hono) {
   const settlementRoutes = new Hono();
 
   // All wallet routes require authentication and Seller role
-  settlementRoutes.use("/*", authMiddleware, roleMiddleware(["seller", "admin"]));
+  settlementRoutes.use("/*", requireAuth(), requireRoles(["seller", "admin"]));
 
   // Seller APIs
   settlementRoutes.get("/wallet", (c) => settlementController.getWallet(c));
@@ -38,9 +38,9 @@ export function setupSettlementRoutes(app: Hono) {
   settlementRoutes.post("/wallet/withdraw", (c) => settlementController.requestWithdrawal(c));
 
   // Admin APIs (In a real app, separate these to /admin/withdrawals or add admin role check)
-  settlementRoutes.get("/admin/withdrawals", roleMiddleware(["admin"]), (c) => settlementController.getPendingWithdrawals(c));
-  settlementRoutes.post("/admin/withdrawals/:id/approve", roleMiddleware(["admin"]), (c) => settlementController.approveWithdrawal(c));
-  settlementRoutes.post("/admin/withdrawals/:id/reject", roleMiddleware(["admin"]), (c) => settlementController.rejectWithdrawal(c));
+  settlementRoutes.get("/admin/withdrawals", requireRoles(["admin"]), (c) => settlementController.getPendingWithdrawals(c));
+  settlementRoutes.post("/admin/withdrawals/:id/approve", requireRoles(["admin"]), (c) => settlementController.approveWithdrawal(c));
+  settlementRoutes.post("/admin/withdrawals/:id/reject", requireRoles(["admin"]), (c) => settlementController.rejectWithdrawal(c));
 
   app.route("/api/settlements", settlementRoutes);
 }

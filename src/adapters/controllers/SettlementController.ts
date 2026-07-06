@@ -1,6 +1,5 @@
 import { Context } from "hono";
 import { ISettlementUseCase } from "@/domain/usecases/ISettlementUseCase";
-import { getUserIdFromContext } from "@/utils/auth";
 import { WithdrawalRequestSchema } from "@/utils/schemas/settlement";
 
 export class SettlementController {
@@ -9,7 +8,7 @@ export class SettlementController {
   // Seller APIs
   async getWallet(c: Context) {
     try {
-      const sellerId = getUserIdFromContext(c);
+      const sellerId = c.get("userId");
       if (!sellerId) return c.json({ success: false, message: "Unauthorized" }, 401);
 
       const result = await this.settlementUseCase.getWallet(sellerId);
@@ -21,7 +20,7 @@ export class SettlementController {
 
   async getSellerTransactions(c: Context) {
     try {
-      const sellerId = getUserIdFromContext(c);
+      const sellerId = c.get("userId");
       if (!sellerId) return c.json({ success: false, message: "Unauthorized" }, 401);
 
       const result = await this.settlementUseCase.getSellerTransactions(sellerId);
@@ -33,7 +32,7 @@ export class SettlementController {
 
   async getSellerWithdrawals(c: Context) {
     try {
-      const sellerId = getUserIdFromContext(c);
+      const sellerId = c.get("userId");
       if (!sellerId) return c.json({ success: false, message: "Unauthorized" }, 401);
 
       const result = await this.settlementUseCase.getSellerWithdrawals(sellerId);
@@ -45,19 +44,21 @@ export class SettlementController {
 
   async requestWithdrawal(c: Context) {
     try {
-      const sellerId = getUserIdFromContext(c);
+      const sellerId = c.get("userId");
       if (!sellerId) return c.json({ success: false, message: "Unauthorized" }, 401);
 
       const body = await c.req.json();
       
-      const result = await this.settlementUseCase.createWithdrawalRequest(
-        sellerId,
-        body.amount,
-        body.bankName,
-        body.bankAccount,
-        body.accountHolder || ""
-      );
-      
+      const parseResult = WithdrawalRequestSchema.safeParse(body);
+      if (!parseResult.success) {
+        return c.json({
+          success: false,
+          message: "Validation Error",
+          errors: parseResult.error.errors,
+        }, 400);
+      }
+
+      const result = await this.settlementUseCase.requestWithdrawal(sellerId, parseResult.data);
       return c.json(result, result.success ? 200 : 400);
     } catch (error) {
       return c.json({ success: false, message: "Internal server error" }, 500);
@@ -67,8 +68,7 @@ export class SettlementController {
   // Admin APIs
   async getPendingWithdrawals(c: Context) {
     try {
-      // In a real app, verify admin role here
-      const result = await this.settlementUseCase.getAllPendingWithdrawals();
+      const result = await this.settlementUseCase.getPendingWithdrawals();
       return c.json(result, result.success ? 200 : 400);
     } catch (error) {
       return c.json({ success: false, message: "Internal server error" }, 500);
@@ -77,11 +77,10 @@ export class SettlementController {
 
   async approveWithdrawal(c: Context) {
     try {
-      const adminId = getUserIdFromContext(c);
-      if (!adminId) return c.json({ success: false, message: "Unauthorized" }, 401);
-      
-      const requestId = c.req.param("id");
-      const result = await this.settlementUseCase.approveWithdrawal(adminId, requestId);
+      const withdrawalId = c.req.param("id");
+      const adminId = c.get("userId");
+
+      const result = await this.settlementUseCase.processWithdrawal(withdrawalId, "Approved", adminId);
       return c.json(result, result.success ? 200 : 400);
     } catch (error) {
       return c.json({ success: false, message: "Internal server error" }, 500);
@@ -90,11 +89,13 @@ export class SettlementController {
 
   async rejectWithdrawal(c: Context) {
     try {
-      const adminId = getUserIdFromContext(c);
-      if (!adminId) return c.json({ success: false, message: "Unauthorized" }, 401);
+      const withdrawalId = c.req.param("id");
+      const adminId = c.get("userId");
       
-      const requestId = c.req.param("id");
-      const result = await this.settlementUseCase.rejectWithdrawal(adminId, requestId);
+      const body = await c.req.json().catch(() => ({}));
+      const note = body.note;
+
+      const result = await this.settlementUseCase.processWithdrawal(withdrawalId, "Rejected", adminId, note);
       return c.json(result, result.success ? 200 : 400);
     } catch (error) {
       return c.json({ success: false, message: "Internal server error" }, 500);
