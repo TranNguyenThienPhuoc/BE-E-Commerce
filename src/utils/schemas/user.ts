@@ -7,6 +7,8 @@ import {
   createIdParamSchema 
 } from './entity';
 
+export const SellerStatusSchema = z.enum(['none', 'pending', 'approved', 'rejected']);
+
 /**
  * User entity schema with validation rules
  */
@@ -16,6 +18,10 @@ export const UserSchema = z.object({
   name: NameSchema,
   password: PasswordSchema,
   role: UserRoleSchema,
+  sellerStatus: SellerStatusSchema.optional().default('none'),
+  shopName: z.string().optional(),
+  shopAddress: z.string().optional(),
+  shopDescription: z.string().optional(),
 }).refine(...entityDateRefinement);
 
 /**
@@ -36,6 +42,10 @@ export const UpdateUserSchema = z.object({
   email: EmailSchema.optional(),
   password: PasswordSchema.optional(),
   role: UserRoleSchema.optional(),
+  sellerStatus: SellerStatusSchema.optional(),
+  shopName: z.string().optional(),
+  shopAddress: z.string().optional(),
+  shopDescription: z.string().optional(),
 }).refine(...atLeastOneFieldRefinement);
 
 /**
@@ -46,6 +56,10 @@ export const UserInputSchema = z.object({
   name: NameSchema,
   password: PasswordSchema,
   role: UserRoleSchema.optional(),
+  sellerStatus: SellerStatusSchema.optional(),
+  shopName: z.string().optional(),
+  shopAddress: z.string().optional(),
+  shopDescription: z.string().optional(),
 }).strict();
 
 /**
@@ -56,6 +70,10 @@ export const SanitizedUserInputSchema = UserInputSchema.transform((data) => ({
   name: data.name.trim(),
   password: data.password,
   role: data.role,
+  sellerStatus: data.sellerStatus,
+  shopName: data.shopName,
+  shopAddress: data.shopAddress,
+  shopDescription: data.shopDescription,
 }));
 
 /**

@@ -11,5 +11,8 @@ export interface IUserUseCase {
   getUser(request: GetUserRequest): Promise<GetUserResponse>;
   listUsers(page?: number, limit?: number): Promise<ListUsersResponse>;
   findUserByEmail(email: string): Promise<boolean>;
-  upgradeToSeller(userId: string): Promise<{ success: boolean; message: string; data?: { accessToken: string } }>;
+  registerSeller(userId: string, shopName: string, shopAddress: string, shopDescription: string): Promise<{ success: boolean; message: string }>;
+  listPendingSellers(page?: number, limit?: number): Promise<ListUsersResponse>;
+  approveSeller(userId: string): Promise<{ success: boolean; message: string }>;
+  rejectSeller(userId: string): Promise<{ success: boolean; message: string }>;
 }

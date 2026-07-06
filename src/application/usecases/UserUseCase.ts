@@ -144,7 +144,7 @@ export class UserUseCase implements IUserUseCase {
     return Boolean(user);
   }
 
-  async upgradeToSeller(userId: string): Promise<{ success: boolean; message: string; data?: { accessToken: string } }> {
+  async registerSeller(userId: string, shopName: string, shopAddress: string, shopDescription: string): Promise<{ success: boolean; message: string }> {
     try {
       const user = await this.userRepository.findById(userId);
       if (!user) {
@@ -154,17 +154,93 @@ export class UserUseCase implements IUserUseCase {
       if (user.role === 'seller' || user.role === 'admin') {
         return StatusBuilder.fail("User is already a seller or admin");
       }
+      
+      if (user.sellerStatus === 'pending') {
+        return StatusBuilder.fail("Seller registration is already pending approval");
+      }
 
       const userEntity = UserEntity.fromValidatedData(user);
-      userEntity.role = 'seller';
+      userEntity.sellerStatus = 'pending';
+      userEntity.shopName = shopName;
+      userEntity.shopAddress = shopAddress;
+      userEntity.shopDescription = shopDescription;
 
-      // Update in DB
       await this.userRepository.save(userEntity.toJSON());
 
-      const { generateAccessToken } = await import("@/utils/auth");
-      const accessToken = generateAccessToken(user.id, 'seller');
+      return StatusBuilder.ok({ message: "Seller registration submitted successfully" });
+    } catch (error) {
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
+    }
+  }
 
-      return StatusBuilder.ok({ accessToken });
+  async listPendingSellers(page = 1, limit = 10): Promise<ListUsersResponse> {
+    const normalizedPage = Math.max(1, page);
+    const normalizedLimit = Math.min(Math.max(1, limit), 100);
+    try {
+      const users = await this.userRepository.findAll();
+      const pendingSellers = users.filter(u => u.sellerStatus === 'pending');
+      const total = pendingSellers.length;
+      const skip = (normalizedPage - 1) * normalizedLimit;
+      const paginatedUsers = pendingSellers.slice(skip, skip + normalizedLimit);
+      const totalPages = total === 0 ? 1 : Math.max(1, Math.ceil(total / normalizedLimit));
+
+      return StatusBuilder.paginated(paginatedUsers, {
+        page: normalizedPage,
+        limit: normalizedLimit,
+        total,
+        totalPages,
+      });
+    } catch (error) {
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
+    }
+  }
+
+  async approveSeller(userId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        return StatusBuilder.fail("User not found");
+      }
+
+      if (user.sellerStatus !== 'pending') {
+        return StatusBuilder.fail("User is not in pending status");
+      }
+
+      const userEntity = UserEntity.fromValidatedData(user);
+      userEntity.sellerStatus = 'approved';
+      userEntity.role = 'seller';
+
+      await this.userRepository.save(userEntity.toJSON());
+
+      return StatusBuilder.ok({ message: "Seller approved successfully" });
+    } catch (error) {
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
+    }
+  }
+
+  async rejectSeller(userId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        return StatusBuilder.fail("User not found");
+      }
+
+      if (user.sellerStatus !== 'pending') {
+        return StatusBuilder.fail("User is not in pending status");
+      }
+
+      const userEntity = UserEntity.fromValidatedData(user);
+      userEntity.sellerStatus = 'rejected';
+
+      await this.userRepository.save(userEntity.toJSON());
+
+      return StatusBuilder.ok({ message: "Seller rejected successfully" });
     } catch (error) {
       return StatusBuilder.fail(
         error instanceof Error ? error.message : "Unknown error occurred",

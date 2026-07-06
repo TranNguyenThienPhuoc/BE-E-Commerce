@@ -18,8 +18,26 @@ export function setupUserRoutes(app: Hono) {
     (c) => userController.getUser(c)
   );
 
-  app.post('/api/users/upgrade-to-seller',
+  app.post('/api/users/seller-register',
     requireAuth(),
-    (c) => userController.upgradeToSeller(c)
+    (c) => userController.registerSeller(c)
+  );
+
+  app.get('/api/admin/sellers/pending',
+    requireAuth(),
+    requireAdmin(),
+    (c) => userController.listPendingSellers(c)
+  );
+
+  app.post('/api/admin/sellers/:id/approve',
+    requireAuth(),
+    requireAdmin(),
+    (c) => userController.approveSeller(c)
+  );
+
+  app.post('/api/admin/sellers/:id/reject',
+    requireAuth(),
+    requireAdmin(),
+    (c) => userController.rejectSeller(c)
   );
 }

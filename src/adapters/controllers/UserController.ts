@@ -48,14 +48,85 @@ export class UserController {
     }
   }
 
-  async upgradeToSeller(c: Context) {
+  async registerSeller(c: Context) {
     try {
       const userId = c.get("userId");
       if (!userId) {
         return c.json(StatusBuilder.fail("Unauthorized"), 401);
       }
+      
+      const body = await c.req.json();
+      const shopName = body.shopName;
+      const shopAddress = body.shopAddress;
+      const shopDescription = body.shopDescription;
+      
+      if (!shopName || !shopAddress) {
+        return c.json(StatusBuilder.fail("Missing required fields"), 400);
+      }
 
-      const response = await this.userUseCase.upgradeToSeller(userId);
+      const response = await this.userUseCase.registerSeller(userId, shopName, shopAddress, shopDescription);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error) {
+      return c.json(
+        StatusBuilder.fail(
+          error instanceof Error ? error.message : "Unknown error",
+        ),
+        500,
+      );
+    }
+  }
+
+  async listPendingSellers(c: Context) {
+    try {
+      const page = parseInt(c.req.query("page") || "1");
+      const limit = parseInt(c.req.query("limit") || "10");
+
+      const response = await this.userUseCase.listPendingSellers(page, limit);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error) {
+      return c.json(
+        StatusBuilder.fail(
+          error instanceof Error ? error.message : "Unknown error",
+        ),
+        500,
+      );
+    }
+  }
+
+  async approveSeller(c: Context) {
+    try {
+      const id = c.req.param("id");
+      const response = await this.userUseCase.approveSeller(id);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error) {
+      return c.json(
+        StatusBuilder.fail(
+          error instanceof Error ? error.message : "Unknown error",
+        ),
+        500,
+      );
+    }
+  }
+
+  async rejectSeller(c: Context) {
+    try {
+      const id = c.req.param("id");
+      const response = await this.userUseCase.rejectSeller(id);
 
       if (response.success) {
         return c.json(response, 200);
