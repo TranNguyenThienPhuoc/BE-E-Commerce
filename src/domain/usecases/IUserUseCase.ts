@@ -11,4 +11,5 @@ export interface IUserUseCase {
   getUser(request: GetUserRequest): Promise<GetUserResponse>;
   listUsers(page?: number, limit?: number): Promise<ListUsersResponse>;
   findUserByEmail(email: string): Promise<boolean>;
+  upgradeToSeller(userId: string): Promise<{ success: boolean; message: string; data?: { accessToken: string } }>;
 }

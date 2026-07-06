@@ -17,4 +17,9 @@ export function setupUserRoutes(app: Hono) {
     validateUserId(),
     (c) => userController.getUser(c)
   );
+
+  app.post('/api/users/upgrade-to-seller',
+    requireAuth(),
+    (c) => userController.upgradeToSeller(c)
+  );
 }

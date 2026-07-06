@@ -143,4 +143,32 @@ export class UserUseCase implements IUserUseCase {
     const user = await this.userRepository.findByEmail(email);
     return Boolean(user);
   }
+
+  async upgradeToSeller(userId: string): Promise<{ success: boolean; message: string; data?: { accessToken: string } }> {
+    try {
+      const user = await this.userRepository.findById(userId);
+      if (!user) {
+        return StatusBuilder.fail("User not found");
+      }
+
+      if (user.role === 'seller' || user.role === 'admin') {
+        return StatusBuilder.fail("User is already a seller or admin");
+      }
+
+      const userEntity = UserEntity.fromValidatedData(user);
+      userEntity.role = 'seller';
+
+      // Update in DB
+      await this.userRepository.save(userEntity.toJSON());
+
+      const { generateAccessToken } = await import("@/utils/auth");
+      const accessToken = generateAccessToken(user.id, 'seller');
+
+      return StatusBuilder.ok({ accessToken });
+    } catch (error) {
+      return StatusBuilder.fail(
+        error instanceof Error ? error.message : "Unknown error occurred",
+      );
+    }
+  }
 }

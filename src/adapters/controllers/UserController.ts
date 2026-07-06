@@ -47,4 +47,28 @@ export class UserController {
       );
     }
   }
+
+  async upgradeToSeller(c: Context) {
+    try {
+      const userId = c.get("userId");
+      if (!userId) {
+        return c.json(StatusBuilder.fail("Unauthorized"), 401);
+      }
+
+      const response = await this.userUseCase.upgradeToSeller(userId);
+
+      if (response.success) {
+        return c.json(response, 200);
+      } else {
+        return c.json(response, 400);
+      }
+    } catch (error) {
+      return c.json(
+        StatusBuilder.fail(
+          error instanceof Error ? error.message : "Unknown error",
+        ),
+        500,
+      );
+    }
+  }
 }
