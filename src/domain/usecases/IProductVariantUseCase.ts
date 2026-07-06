@@ -14,7 +14,6 @@ import {
 export interface IProductVariantUseCase {
   createVariant(
     request: CreateProductVariantRequest,
-    userId: string,
   ): Promise<CreateProductVariantResponse>;
 
   getVariant(
@@ -24,12 +23,10 @@ export interface IProductVariantUseCase {
   updateVariant(
     id: string,
     request: UpdateProductVariantRequest,
-    userId: string,
   ): Promise<UpdateProductVariantResponse>;
 
   deleteVariant(
     request: DeleteProductVariantRequest,
-    userId: string,
   ): Promise<DeleteProductVariantResponse>;
 
   listVariantsByProduct(

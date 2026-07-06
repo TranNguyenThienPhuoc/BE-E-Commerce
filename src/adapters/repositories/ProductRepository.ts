@@ -25,7 +25,6 @@ export class ProductRepository extends BaseRepository implements IProductReposit
     this.tableName = process.env.DYNAMODB_TABLE_PRODUCTS ?? process.env.DYNAMODB_TABLE_PRODUCT ?? "product_table";
     this.categoryIndex = process.env.DYNAMODB_PRODUCTS_CATEGORY_INDEX;
     this.statusIndex = process.env.DYNAMODB_PRODUCTS_STATUS_INDEX;
-    this.sellerIndex = process.env.DYNAMODB_PRODUCTS_SELLER_INDEX;
     this.inventoryTableName = process.env.DYNAMODB_TABLE_INVENTORY ?? "inventory_table";
     this.variantTableName = process.env.DYNAMODB_TABLE_PRODUCT_VARIANTS ?? "product_variant_table";
 
@@ -39,7 +38,6 @@ export class ProductRepository extends BaseRepository implements IProductReposit
   private itemToProduct(item: Record<string, unknown>): Product {
     return {
       id: (item.id || item.Id) as string,
-      sellerId: item.sellerId as string,
       name: item.name as string,
       description: item.description as string | undefined,
       price: item.price as number,
@@ -151,7 +149,6 @@ export class ProductRepository extends BaseRepository implements IProductReposit
   }
 
   async list(filters?: {
-    sellerId?: string;
     category?: string;
     status?: ProductStatus;
     search?: string;
@@ -177,10 +174,7 @@ export class ProductRepository extends BaseRepository implements IProductReposit
       }
     }
 
-    if (filters?.sellerId) {
-      filterExpressions.push("sellerId = :sellerIdFilter");
-      expressionAttributeValues[":sellerIdFilter"] = filters.sellerId;
-    }
+
 
     if (filters?.category) {
       filterExpressions.push("#category = :category");
@@ -234,90 +228,6 @@ export class ProductRepository extends BaseRepository implements IProductReposit
     return this.mapItems(items);
   }
 
-  async findBySellerId(
-    sellerId: string,
-    filters?: {
-      category?: string;
-      status?: ProductStatus;
-      search?: string;
-    },
-  ): Promise<Product[]> {
-    const filterExpressions: string[] = [];
-    const expressionAttributeValues: Record<string, unknown> = {
-      ":sellerId": sellerId,
-    };
-    const expressionAttributeNames: Record<string, string> = {};
-
-    if (filters?.category) {
-      filterExpressions.push("#category = :category");
-      expressionAttributeValues[":category"] = filters.category;
-      expressionAttributeNames["#category"] = "category";
-    }
-
-    if (filters?.status) {
-      filterExpressions.push("#status = :status");
-      expressionAttributeValues[":status"] = filters.status;
-      expressionAttributeNames["#status"] = "status";
-    }
-
-    if (filters?.search) {
-      filterExpressions.push(
-        "(contains(#name, :search) OR contains(#description, :search))",
-      );
-      expressionAttributeValues[":search"] = filters.search;
-      expressionAttributeNames["#name"] = "name";
-      expressionAttributeNames["#description"] = "description";
-    }
-
-    const filterExpression =
-      filterExpressions.length > 0 ? filterExpressions.join(" AND ") : undefined;
-
-    if (this.sellerIndex) {
-      const cmd: QueryCommand = new QueryCommand({
-        TableName: this.tableName,
-        IndexName: this.sellerIndex,
-        KeyConditionExpression: "sellerId = :sellerId",
-        FilterExpression: filterExpression,
-        ExpressionAttributeValues: expressionAttributeValues,
-        ExpressionAttributeNames:
-          Object.keys(expressionAttributeNames).length > 0
-            ? expressionAttributeNames
-            : undefined,
-      });
-
-      const res = (await dynamoDBDocumentClient.send(cmd)) as DynamoDBResult;
-      return this.mapItems(res.Items as Record<string, unknown>[]);
-    }
-
-    const items: Record<string, unknown>[] = [];
-    let ExclusiveStartKey: Record<string, unknown> | undefined;
-
-    const scanFilterExpressions = ["sellerId = :sellerId"];
-    if (filterExpression) {
-      scanFilterExpressions.push(filterExpression);
-    }
-
-    do {
-      const cmd: ScanCommand = new ScanCommand({
-        TableName: this.tableName,
-        FilterExpression: scanFilterExpressions.join(" AND "),
-        ExpressionAttributeValues: expressionAttributeValues,
-        ExpressionAttributeNames:
-          Object.keys(expressionAttributeNames).length > 0
-            ? expressionAttributeNames
-            : undefined,
-        ExclusiveStartKey,
-      });
-
-      const res = (await dynamoDBDocumentClient.send(cmd)) as DynamoDBResult;
-      if (res.Items) {
-        items.push(...(res.Items as Record<string, unknown>[]));
-      }
-      ExclusiveStartKey = res.LastEvaluatedKey;
-    } while (ExclusiveStartKey);
-
-    return this.mapItems(items);
-  }
 
   async save(product: Product): Promise<Product> {
     try {

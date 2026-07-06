@@ -63,12 +63,10 @@ export class ProductUseCase implements IProductUseCase {
 
   async createProduct(
     request: CreateProductRequest,
-    sellerId: string,
   ): Promise<CreateProductResponse> {
     try {
       const validatedInput = validateData(SanitizedProductInputSchema, {
         ...request,
-        sellerId,
       });
 
       const categorySlug = await this.resolveCategorySlug(
@@ -87,11 +85,11 @@ export class ProductUseCase implements IProductUseCase {
       const productId = crypto.randomUUID();
       const product = new ProductEntity(
         productId,
-        validatedInput.sellerId,
         validatedInput.name,
         validatedInput.price,
         totalStock,
         validatedInput.images || [],
+        validatedInput.seoTitle,
         validatedInput.description,
         validatedInput.category,
         validatedInput.status || "pending",
@@ -184,9 +182,8 @@ export class ProductUseCase implements IProductUseCase {
       }
 
       if (role !== "admin") {
-        const isOwner = userId && product.sellerId === userId;
         const isActive = product.status === "active";
-        if (!isOwner && !isActive) {
+        if (!isActive) {
           return StatusBuilder.fail("Product not found", [
             { field: "id", message: "No product exists with the provided ID" },
           ]);
@@ -202,7 +199,6 @@ export class ProductUseCase implements IProductUseCase {
   async updateProduct(
     id: string,
     request: UpdateProductRequest,
-    userId: string,
   ): Promise<UpdateProductResponse> {
     try {
       const validatedParams = validateData(ProductIdParamSchema, { id });
@@ -216,14 +212,7 @@ export class ProductUseCase implements IProductUseCase {
         ]);
       }
 
-      if (existingProduct.sellerId !== userId) {
-        return StatusBuilder.fail("Forbidden: You do not own this product", [
-          {
-            field: "sellerId",
-            message: "Only the product owner can update it",
-          },
-        ]);
-      }
+
 
       const validatedUpdate = validateData(
         UpdateProductSchema,
@@ -252,7 +241,6 @@ export class ProductUseCase implements IProductUseCase {
 
   async deleteProduct(
     request: DeleteProductRequest,
-    userId: string,
   ): Promise<DeleteProductResponse> {
     try {
       const validatedParams = validateData(ProductIdParamSchema, {
@@ -266,14 +254,7 @@ export class ProductUseCase implements IProductUseCase {
         ]);
       }
 
-      if (product.sellerId !== userId) {
-        return StatusBuilder.fail("Forbidden: You do not own this product", [
-          {
-            field: "sellerId",
-            message: "Only the product owner can delete it",
-          },
-        ]);
-      }
+
 
       const variantsRes = await this.variantUseCase.listVariantsByProduct({
         productId: validatedParams.id,
@@ -346,38 +327,7 @@ export class ProductUseCase implements IProductUseCase {
     }
   }
 
-  async listUserProducts(
-    request: ListProductsRequest,
-    userId: string,
-  ): Promise<ListProductsResponse> {
-    try {
-      const page = request.page || 1;
-      const limit = request.limit || 10;
-      const skip = (page - 1) * limit;
 
-      const categoryFilter = await this.resolveCategoryFilter(request.category);
-      const products = await this.productRepository.findBySellerId(userId, {
-        category: categoryFilter,
-        status: request.status,
-        search: request.search,
-      });
-
-      this.sortProducts(products, request.sortBy, request.sortOrder);
-
-      const total = products.length;
-      const paginatedProducts = products.slice(skip, skip + limit);
-      const totalPages = Math.ceil(total / limit);
-
-      return StatusBuilder.paginated(paginatedProducts, {
-        page,
-        limit,
-        total,
-        totalPages,
-      });
-    } catch (error) {
-      return this.handleError(error);
-    }
-  }
 
   async generatePresignedUrl(
     request: GeneratePresignedUrlRequest,

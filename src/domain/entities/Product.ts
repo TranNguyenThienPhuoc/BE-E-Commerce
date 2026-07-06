@@ -10,8 +10,8 @@ import { ProductVariant } from "@/utils/schemas/productVariant";
 
 export class ProductEntity implements Product {
   private idValue: string;
-  private sellerIdValue: string;
   private nameValue: string;
+  private seoTitleValue?: string;
   private descriptionValue?: string;
   private priceValue: number;
   private stockValue: number;
@@ -24,11 +24,11 @@ export class ProductEntity implements Product {
 
   constructor(
     id: string,
-    sellerId: string,
     name: string,
     price: number,
     stock: number,
     images: string[] = [],
+    seoTitle?: string,
     description?: string,
     category?: string,
     status: ProductStatus = "pending",
@@ -37,8 +37,8 @@ export class ProductEntity implements Product {
     updatedAt?: Date,
   ) {
     this.idValue = id;
-    this.sellerIdValue = sellerId;
     this.nameValue = name;
+    this.seoTitleValue = seoTitle;
     this.priceValue = price;
     this.stockValue = stock;
     this.imagesValue = images;
@@ -54,12 +54,12 @@ export class ProductEntity implements Product {
     return this.idValue;
   }
 
-  get sellerId(): string {
-    return this.sellerIdValue;
-  }
-
   get name(): string {
     return this.nameValue;
+  }
+
+  get seoTitle(): string | undefined {
+    return this.seoTitleValue;
   }
 
   get description(): string | undefined {
@@ -100,6 +100,11 @@ export class ProductEntity implements Product {
 
   set name(value: string) {
     this.nameValue = value;
+    this.updatedAtValue = new Date();
+  }
+
+  set seoTitle(value: string | undefined) {
+    this.seoTitleValue = value;
     this.updatedAtValue = new Date();
   }
 
@@ -157,8 +162,8 @@ export class ProductEntity implements Product {
   toJSON(): Product {
     return {
       id: this.id,
-      sellerId: this.sellerId,
       name: this.name,
+      seoTitle: this.seoTitle,
       description: this.description,
       price: this.price,
       stock: this.stock,
@@ -174,11 +179,11 @@ export class ProductEntity implements Product {
   static fromValidatedData(data: Product): ProductEntity {
     return new ProductEntity(
       data.id,
-      data.sellerId,
       data.name,
       data.price,
       data.stock,
       data.images,
+      data.seoTitle,
       data.description,
       data.category,
       data.status,

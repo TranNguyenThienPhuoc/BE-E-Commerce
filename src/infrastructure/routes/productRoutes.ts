@@ -16,10 +16,9 @@ export function setupProductRoutes(app: Hono) {
   app.patch("/api/products/:id/approve", requireAuth(), requireAdmin(), (c) =>
     productController.approveProduct(c),
   );
-  app.post("/api/products", requireAuth(), (c) => productController.createProduct(c));
-  app.get("/api/products/user", requireAuth(), (c) => productController.listUserProducts(c));
+  app.post("/api/products", requireAuth(), requireAdmin(), (c) => productController.createProduct(c));
   app.get("/api/products", (c) => productController.listProducts(c));
   app.get("/api/products/:id", (c) => productController.getProduct(c));
-  app.put("/api/products/:id", requireAuth(), (c) => productController.updateProduct(c));
-  app.delete("/api/products/:id", requireAuth(), (c) => productController.deleteProduct(c));
+  app.put("/api/products/:id", requireAuth(), requireAdmin(), (c) => productController.updateProduct(c));
+  app.delete("/api/products/:id", requireAuth(), requireAdmin(), (c) => productController.deleteProduct(c));
 }

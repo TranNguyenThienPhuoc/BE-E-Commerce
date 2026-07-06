@@ -23,7 +23,6 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
     this.tableName = process.env.DYNAMODB_TABLE_ORDERS ?? process.env.DYNAMODB_TABLE_ORDER ?? "order_table";
     this.cartTableName = process.env.DYNAMODB_TABLE_CARTS ?? process.env.DYNAMODB_TABLE_CART ?? "cart_item_table";
     this.customerIndex = process.env.DYNAMODB_ORDERS_CUSTOMER_INDEX;
-    this.sellerIndex = process.env.DYNAMODB_ORDERS_SELLER_INDEX;
     this.statusIndex = process.env.DYNAMODB_ORDERS_STATUS_INDEX;
 
     if (!process.env.DYNAMODB_TABLE_ORDERS && !process.env.DYNAMODB_TABLE_ORDER) {
@@ -38,7 +37,6 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
       id: (item.id || item.Id) as string,
       customerId: item.customerId as string,
       customerEmail: item.customerEmail as string,
-      sellerId: item.sellerId as string,
       cartId: item.cartId as string,
       items: item.items as OrderItem[],
       totalAmount: item.totalAmount as number,
@@ -135,22 +133,7 @@ export class OrderRepository extends BaseRepository implements IOrderRepository 
     return allOrders.filter((o) => o.customerId === customerId);
   }
 
-  async findBySellerId(sellerId: string): Promise<Order[]> {
-    if (this.sellerIndex) {
-      const cmd = new QueryCommand({
-        TableName: this.tableName,
-        IndexName: this.sellerIndex,
-        KeyConditionExpression: "sellerId = :sellerId",
-        ExpressionAttributeValues: { ":sellerId": sellerId },
-      });
 
-      const res = await dynamoDBDocumentClient.send(cmd);
-      return this.mapItems(res.Items as Record<string, unknown>[]);
-    }
-
-    const allOrders = await this.findAll();
-    return allOrders.filter((o) => o.sellerId === sellerId);
-  }
 
   async findByStatus(status: OrderStatus): Promise<Order[]> {
     if (this.statusIndex) {

@@ -13,7 +13,6 @@ export class OrderEntity implements Order {
   private idValue: string;
   private customerIdValue: string;
   private customerEmailValue: string;
-  private sellerIdValue: string;
   private cartIdValue: string;
   private itemsValue: OrderItem[];
   private totalAmountValue: number;
@@ -32,7 +31,6 @@ export class OrderEntity implements Order {
     id: string,
     customerId: string,
     customerEmail: string,
-    sellerId: string,
     cartId: string,
     items: OrderItem[],
     totalAmount: number,
@@ -50,7 +48,6 @@ export class OrderEntity implements Order {
     this.idValue = id;
     this.customerIdValue = customerId;
     this.customerEmailValue = customerEmail;
-    this.sellerIdValue = sellerId;
     this.cartIdValue = cartId;
     this.itemsValue = items;
     this.totalAmountValue = totalAmount;
@@ -69,7 +66,6 @@ export class OrderEntity implements Order {
   get id(): string { return this.idValue; }
   get customerId(): string { return this.customerIdValue; }
   get customerEmail(): string { return this.customerEmailValue; }
-  get sellerId(): string { return this.sellerIdValue; }
   get cartId(): string { return this.cartIdValue; }
   get items(): OrderItem[] { return this.itemsValue; }
   get totalAmount(): number { return this.totalAmountValue; }
@@ -145,7 +141,6 @@ export class OrderEntity implements Order {
       id: this.idValue,
       customerId: this.customerIdValue,
       customerEmail: this.customerEmailValue,
-      sellerId: this.sellerIdValue,
       cartId: this.cartIdValue,
       items: this.itemsValue,
       totalAmount: this.totalAmountValue,
@@ -167,7 +162,6 @@ export class OrderEntity implements Order {
       data.id,
       data.customerId,
       data.customerEmail,
-      data.sellerId,
       data.cartId,
       data.items,
       data.totalAmount,

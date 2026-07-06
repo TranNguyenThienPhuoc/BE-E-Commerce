@@ -17,7 +17,7 @@ export class ProductVariantController {
       }
 
       const body = (await c.req.json()) as CreateProductVariantRequest;
-      const response = await this.variantUseCase.createVariant(body, userId);
+      const response = await this.variantUseCase.createVariant(body);
 
       if (response.success) {
         return c.json(response, 201);
@@ -65,7 +65,7 @@ export class ProductVariantController {
 
       const id = c.req.param("id");
       const body = (await c.req.json()) as UpdateProductVariantRequest;
-      const response = await this.variantUseCase.updateVariant(id, body, userId);
+      const response = await this.variantUseCase.updateVariant(id, body);
 
       if (response.success) {
         return c.json(response, 200);
@@ -91,7 +91,7 @@ export class ProductVariantController {
       }
 
       const id = c.req.param("id");
-      const response = await this.variantUseCase.deleteVariant({ id }, userId);
+      const response = await this.variantUseCase.deleteVariant({ id });
 
       if (response.success) {
         return c.json(response, 200);

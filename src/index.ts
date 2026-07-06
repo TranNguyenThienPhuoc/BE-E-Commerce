@@ -7,12 +7,11 @@ import { setupCategoryRoutes } from "./infrastructure/routes/categoryRoutes";
 import { setupOrderRoutes } from "./infrastructure/routes/orderRoutes";
 import { setupPaymentRoutes } from "./infrastructure/routes/paymentRoutes";
 import { setupShipmentRoutes } from "./infrastructure/routes/shipmentRoutes";
-import { setupReportRoutes } from "./infrastructure/routes/reportRoutes";
+
 import { setupCartRoutes } from "./infrastructure/routes/cartRoutes";
 import { setupUploadRoutes } from "./infrastructure/routes/uploadRoutes";
 import { setupInventoryRoutes } from "./infrastructure/routes/inventoryRoutes";
 import { setupReviewRoutes } from "./infrastructure/routes/reviewRoutes";
-import { setupSettlementRoutes } from "./infrastructure/routes/settlementRoutes";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { loadSecrets } from "./config";
@@ -51,12 +50,11 @@ setupCategoryRoutes(app);
 setupOrderRoutes(app);
 setupPaymentRoutes(app);
 setupShipmentRoutes(app);
-setupReportRoutes(app);
+
 setupCartRoutes(app);
 setupUploadRoutes(app);
 setupInventoryRoutes(app);
 setupReviewRoutes(app);
-setupSettlementRoutes(app);
 
 // Initialize Background Workers
 import { Container } from "./infrastructure/dependencies/Container";

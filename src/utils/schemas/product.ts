@@ -14,8 +14,8 @@ import {
 export const ProductSchema = z
   .object({
     ...BaseEntityFields,
-    sellerId: NonEmptyStringSchema,
     name: NonEmptyStringSchema.max(200, "Product name must be less than 200 characters"),
+    seoTitle: z.string().max(100, "SEO Title must be less than 100 characters").optional(),
     description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
     price: PositiveNumberSchema,
     stock: z.number().int().min(0, "Stock cannot be negative"),
@@ -32,8 +32,8 @@ export const ProductSchema = z
  * Schema for validating product creation input
  */
 export const CreateProductSchema = z.object({
-  sellerId: NonEmptyStringSchema,
   name: NonEmptyStringSchema.max(200, "Product name must be less than 200 characters"),
+  seoTitle: z.string().max(100, "SEO Title must be less than 100 characters").optional(),
   description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
   price: PositiveNumberSchema,
   stock: z.number().int().min(0, "Stock cannot be negative"),
@@ -51,8 +51,8 @@ export const CreateProductSchema = z.object({
  */
 export const UpdateProductSchema = z
   .object({
-    sellerId: NonEmptyStringSchema.optional(),
     name: NonEmptyStringSchema.max(200, "Product name must be less than 200 characters").optional(),
+    seoTitle: z.string().max(100, "SEO Title must be less than 100 characters").optional(),
     description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
     price: PositiveNumberSchema.optional(),
     stock: z.number().int().min(0, "Stock cannot be negative").optional(),
@@ -69,8 +69,8 @@ export const UpdateProductSchema = z
  * Raw product input schema for API validation
  */
 export const ProductInputSchema = z.object({
-  sellerId: NonEmptyStringSchema,
   name: NonEmptyStringSchema.max(200),
+  seoTitle: z.string().max(100).optional(),
   description: z.string().max(2000).optional(),
   price: PositiveNumberSchema,
   stock: z.number().int().min(0),
@@ -96,8 +96,8 @@ export const ProductInputSchema = z.object({
 });
 
 export const SanitizedProductInputSchema = ProductInputSchema.transform((data) => ({
-  sellerId: data.sellerId.trim(),
   name: data.name.trim(),
+  seoTitle: data.seoTitle?.trim() || data.name.trim(),
   description: data.description?.trim(),
   price: data.price,
   stock: data.stock,

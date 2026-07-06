@@ -129,6 +129,20 @@ export class PaymentUseCase implements IPaymentUseCase {
     }
   }
 
+  private async updateOrderPaymentStatus(orderId: string): Promise<void> {
+    const orderData = await this.orderRepository.findById(orderId);
+    if (orderData) {
+      const order = OrderEntity.fromValidatedData(orderData);
+      order.paymentStatus = "paid";
+      order.paidAt = new Date().toISOString();
+      if (order.status === "pending") {
+        order.status = "confirmed";
+      }
+      await this.orderRepository.save(order.toJSON());
+      eventBus.emit(EVENTS.ORDER_PAID, order.id);
+    }
+  }
+
   async processPayment(id: string): Promise<ApiResponse<Payment>> {
     try {
       const paymentData = await this.paymentRepository.findById(id);

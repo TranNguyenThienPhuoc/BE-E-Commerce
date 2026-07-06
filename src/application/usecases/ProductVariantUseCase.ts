@@ -31,7 +31,6 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
 
   async createVariant(
     request: CreateProductVariantRequest,
-    userId: string,
   ): Promise<CreateProductVariantResponse> {
     try {
       const validatedInput = validateData(CreateProductVariantSchema, request);
@@ -42,9 +41,7 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
         return StatusBuilder.fail("Product not found");
       }
 
-      if (product.sellerId !== userId) {
-        return StatusBuilder.fail("Forbidden: You do not own this product");
-      }
+
 
       const existingSku = await this.variantRepository.findBySku(validatedInput.sku);
       if (existingSku && existingSku.productId === validatedInput.productId) {
@@ -118,7 +115,6 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
   async updateVariant(
     id: string,
     request: UpdateProductVariantRequest,
-    userId: string,
   ): Promise<UpdateProductVariantResponse> {
     try {
       const validatedParams = validateData(ProductVariantIdParamSchema, { id });
@@ -131,8 +127,8 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
 
       // Check product ownership
       const product = await this.productRepository.findById(existingVariant.productId);
-      if (!product || product.sellerId !== userId) {
-        return StatusBuilder.fail("Forbidden: You do not own the product for this variant");
+      if (!product) {
+        return StatusBuilder.fail("Product not found");
       }
 
       // Check SKU uniqueness if it's being updated
@@ -180,7 +176,6 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
 
   async deleteVariant(
     request: DeleteProductVariantRequest,
-    userId: string,
   ): Promise<DeleteProductVariantResponse> {
     try {
       const validatedParams = validateData(ProductVariantIdParamSchema, request);
@@ -191,8 +186,8 @@ export class ProductVariantUseCase implements IProductVariantUseCase {
       }
 
       const product = await this.productRepository.findById(variant.productId);
-      if (!product || product.sellerId !== userId) {
-        return StatusBuilder.fail("Forbidden: You do not own the product for this variant");
+      if (!product) {
+        return StatusBuilder.fail("Product not found");
       }
 
       const deleted = await this.variantRepository.deleteVariantWithInventory(validatedParams.id);

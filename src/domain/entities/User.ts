@@ -18,10 +18,6 @@ export class UserEntity implements User {
   private nameValue: string;
   private passwordValue: string;
   private roleValue: UserRole;
-  private sellerStatusValue: 'none' | 'pending' | 'approved' | 'rejected';
-  private shopNameValue?: string;
-  private shopAddressValue?: string;
-  private shopDescriptionValue?: string;
   private createdAtValue: Date;
   private updatedAtValue: Date;
 
@@ -31,10 +27,6 @@ export class UserEntity implements User {
     name: string,
     password: string,
     role: UserRole = 'customer',
-    sellerStatus: 'none' | 'pending' | 'approved' | 'rejected' = 'none',
-    shopName?: string,
-    shopAddress?: string,
-    shopDescription?: string,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
   ) {
@@ -43,10 +35,6 @@ export class UserEntity implements User {
     this.nameValue = name;
     this.passwordValue = password;
     this.roleValue = role;
-    this.sellerStatusValue = sellerStatus;
-    this.shopNameValue = shopName;
-    this.shopAddressValue = shopAddress;
-    this.shopDescriptionValue = shopDescription;
     this.createdAtValue = createdAt;
     this.updatedAtValue = updatedAt;
 
@@ -83,22 +71,6 @@ export class UserEntity implements User {
     return this.roleValue;
   }
 
-  get sellerStatus() {
-    return this.sellerStatusValue;
-  }
-
-  get shopName() {
-    return this.shopNameValue;
-  }
-
-  get shopAddress() {
-    return this.shopAddressValue;
-  }
-
-  get shopDescription() {
-    return this.shopDescriptionValue;
-  }
-
   get createdAt(): Date {
     return this.createdAtValue;
   }
@@ -128,26 +100,6 @@ export class UserEntity implements User {
     this.updatedAtValue = new Date();
   }
 
-  set sellerStatus(value: 'none' | 'pending' | 'approved' | 'rejected') {
-    this.sellerStatusValue = value;
-    this.updatedAtValue = new Date();
-  }
-
-  set shopName(value: string | undefined) {
-    this.shopNameValue = value;
-    this.updatedAtValue = new Date();
-  }
-
-  set shopAddress(value: string | undefined) {
-    this.shopAddressValue = value;
-    this.updatedAtValue = new Date();
-  }
-
-  set shopDescription(value: string | undefined) {
-    this.shopDescriptionValue = value;
-    this.updatedAtValue = new Date();
-  }
-
   static fromValidatedData(data: User): UserEntity {
     return new UserEntity(
       data.id,
@@ -155,10 +107,6 @@ export class UserEntity implements User {
       data.name,
       data.password,
       data.role,
-      data.sellerStatus,
-      data.shopName,
-      data.shopAddress,
-      data.shopDescription,
       data.createdAt,
       data.updatedAt,
     );
@@ -213,10 +161,6 @@ export class UserEntity implements User {
       name: this.name,
       password: this.password,
       role: this.role,
-      sellerStatus: this.sellerStatus,
-      shopName: this.shopName,
-      shopAddress: this.shopAddress,
-      shopDescription: this.shopDescription,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };

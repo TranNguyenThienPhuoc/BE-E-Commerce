@@ -26,7 +26,7 @@ export class ProductController {
       const json = await c.req.json();
       console.log("[ProductController] Incoming JSON:", JSON.stringify(json, null, 2));
       const body = CreateProductRequestSchema.parse(json);
-      const response = await this.productUseCase.createProduct(body, userId);
+      const response = await this.productUseCase.createProduct(body);
       console.log(response)
 
       if (response.success) {
@@ -91,7 +91,7 @@ export class ProductController {
       const id = c.req.param("id");
       const json = await c.req.json();
       const body = UpdateProductRequestSchema.parse(json);
-      const response = await this.productUseCase.updateProduct(id, body, userId);
+      const response = await this.productUseCase.updateProduct(id, body);
 
       if (response.success) {
         return c.json(response, 200);
@@ -126,7 +126,7 @@ export class ProductController {
       }
 
       const id = c.req.param("id");
-      const response = await this.productUseCase.deleteProduct({ id }, userId);
+      const response = await this.productUseCase.deleteProduct({ id });
 
       if (response.success) {
         return c.json(response, 200);
@@ -172,35 +172,7 @@ export class ProductController {
     }
   }
 
-  async listUserProducts(c: Context) {
-    try {
-      const userId = c.get("userId") as string;
-      if (!userId) {
-        return c.json(StatusBuilder.fail("Unauthorized: User ID not found"), 401);
-      }
 
-      const query = c.req.query();
-      const request = ListProductsRequestSchema.parse(query);
-
-      const response = await this.productUseCase.listUserProducts(
-        request,
-        userId,
-      );
-
-      if (response.success) {
-        return c.json(response, 200);
-      } else {
-        return c.json(response, 400);
-      }
-    } catch (error: unknown) {
-      return c.json(
-        StatusBuilder.fail(
-          error instanceof Error ? error.message : "Internal Server Error",
-        ),
-        500,
-      );
-    }
-  }
 
   async generatePresignedUrl(c: Context) {
     try {

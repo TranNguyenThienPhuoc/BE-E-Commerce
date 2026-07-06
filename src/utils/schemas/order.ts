@@ -36,7 +36,6 @@ export const OrderSchema = z.object({
   ...BaseEntityFields,
   customerId: NonEmptyStringSchema,
   customerEmail: z.string().email(),
-  sellerId: NonEmptyStringSchema,
   cartId: NonEmptyStringSchema,
   items: z.array(OrderItemSchema).min(1, 'Order must have at least one item'),
   totalAmount: PositiveNumberSchema,
@@ -53,7 +52,6 @@ export const OrderSchema = z.object({
 export const CreateOrderSchema = z.object({
   customerId: NonEmptyStringSchema,
   customerEmail: z.string().email(),
-  sellerId: NonEmptyStringSchema,
   cartId: NonEmptyStringSchema,
   items: z.array(OrderItemSchema).min(1),
   totalAmount: PositiveNumberSchema,

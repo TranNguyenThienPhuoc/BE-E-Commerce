@@ -114,32 +114,12 @@ export class OrderController {
     }
   }
 
-  async listSellerOrders(c: Context) {
-    try {
-      const userId = c.get("userId") as string;
-      if (!userId) {
-        return c.json(StatusBuilder.fail("Unauthorized"), 401);
-      }
 
-      const response = await this.orderUseCase.listSellerOrders(userId);
-
-      if (response.success) {
-        return c.json(response, 200);
-      } else {
-        return c.json(response, 400);
-      }
-    } catch (error: unknown) {
-      const err = error as Error;
-      return c.json(
-        StatusBuilder.fail(err.message || "Internal Server Error"),
-        500
-      );
-    }
-  }
 
   async updateOrderStatus(c: Context) {
     try {
       const userId = c.get("userId") as string;
+      const role = c.get("role") as string;
       if (!userId) {
         return c.json(StatusBuilder.fail("Unauthorized"), 401);
       }
@@ -152,7 +132,7 @@ export class OrderController {
         return c.json(StatusBuilder.fail("Status is required"), 400);
       }
 
-      const response = await this.orderUseCase.updateOrderStatus(id, userId, status);
+      const response = await this.orderUseCase.updateOrderStatus(id, status);
 
       if (response.success) {
         return c.json(response, 200);
@@ -177,7 +157,8 @@ export class OrderController {
       }
 
       const id = c.req.param("id");
-      const response = await this.orderUseCase.cancelOrder(id, userId);
+      const role = c.get("role") as string | undefined;
+      const response = await this.orderUseCase.cancelOrder(id, userId, role);
 
       if (response.success) {
         return c.json(response, 200);
@@ -194,33 +175,5 @@ export class OrderController {
     }
   }
 
-  async getSalesReport(c: Context) {
-    try {
-      const userId = c.get("userId") as string;
 
-      if (!userId) {
-        return c.json(StatusBuilder.fail("Unauthorized"), 401);
-      }
-
-      const startDate = c.req.query("startDate");
-      const endDate = c.req.query("endDate");
-
-      const response = await this.orderUseCase.getSalesReport(userId, {
-        startDate,
-        endDate,
-      });
-
-      if (response.success) {
-        return c.json(response, 200);
-      } else {
-        return c.json(response, 400);
-      }
-    } catch (error: unknown) {
-      const err = error as Error;
-      return c.json(
-        StatusBuilder.fail(err.message || "Internal Server Error"),
-        500
-      );
-    }
-  }
 }
