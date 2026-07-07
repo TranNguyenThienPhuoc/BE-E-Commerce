@@ -474,6 +474,9 @@ export class ProductUseCase implements IProductUseCase {
       product.description = update.description;
     if (update.category !== undefined) product.category = update.category;
     if (update.status !== undefined) product.status = update.status;
+    if (update.isFlashSale !== undefined) product.isFlashSale = update.isFlashSale;
+    if (update.flashSalePrice !== undefined) product.flashSalePrice = update.flashSalePrice;
+    if (update.flashSaleEndDate !== undefined) product.flashSaleEndDate = update.flashSaleEndDate;
   }
 
   private sortProducts(
