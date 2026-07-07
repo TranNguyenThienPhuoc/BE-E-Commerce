@@ -16,7 +16,6 @@ const secretsManager = new SecretsManagerClient({ region: process.env.AWS_REGION
 
 export async function loadSecrets() {
   const secretName = process.env.SECRET_NAME || 'ecommerce/production/secrets';
-  
   try {
     const response = await secretsManager.send(
       new GetSecretValueCommand({

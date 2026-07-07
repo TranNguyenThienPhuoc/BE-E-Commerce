@@ -208,7 +208,11 @@ export class PaymentUseCase implements IPaymentUseCase {
         returnUrl: `${config.frontendUrl}/payment/success?order_id=${orderId}`,
       };
 
+      console.log("[PayOS Debug] clientId:", config.payosClientId ? config.payosClientId.substring(0, 8) + "..." : "EMPTY");
+      console.log("[PayOS Debug] apiKey:", config.payosApiKey ? config.payosApiKey.substring(0, 8) + "..." : "EMPTY");
+      console.log("[PayOS Debug] checksumKey:", config.payosChecksumKey ? config.payosChecksumKey.substring(0, 8) + "..." : "EMPTY");
       const paymentLink = await this.payos.paymentRequests.create(paymentData);
+
       
       if (!paymentLink.checkoutUrl) {
         return StatusBuilder.fail("Failed to create PayOS session URL");
