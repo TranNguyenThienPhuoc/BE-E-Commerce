@@ -13,6 +13,7 @@ import { setupUploadRoutes } from "./infrastructure/routes/uploadRoutes";
 import { setupInventoryRoutes } from "./infrastructure/routes/inventoryRoutes";
 import { setupReviewRoutes } from "./infrastructure/routes/reviewRoutes";
 import { setupWishlistRoutes } from "./infrastructure/routes/wishlistRoutes";
+import { setupSupportTicketRoutes } from "./infrastructure/routes/supportTicketRoutes";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { loadSecrets } from "./config";
@@ -57,6 +58,7 @@ setupUploadRoutes(app);
 setupInventoryRoutes(app);
 setupReviewRoutes(app);
 setupWishlistRoutes(app);
+setupSupportTicketRoutes(app);
 
 // Initialize Background Workers
 import { Container } from "./infrastructure/dependencies/Container";

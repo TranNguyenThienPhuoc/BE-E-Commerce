@@ -60,6 +60,11 @@ import { IWishlistUseCase } from "@/domain/usecases/IWishlistUseCase";
 import { WishlistUseCase } from "@/application/usecases/WishlistUseCase";
 import { WishlistController } from "@/interfaces/controllers/WishlistController";
 
+import { ISupportTicketRepository } from "@/domain/repositories/ISupportTicketRepository";
+import { SupportTicketRepository } from "@/adapters/repositories/SupportTicketRepository";
+import { ISupportTicketUseCase, SupportTicketUseCase } from "@/application/usecases/SupportTicketUseCase";
+import { SupportTicketController } from "@/adapters/controllers/SupportTicketController";
+
 export class Container {
   private static instance: Container;
   private userRepository: IUserRepository;
@@ -100,6 +105,9 @@ export class Container {
   private wishlistController: WishlistController;
   private s3Service: S3Service;
   private redisService: RedisService;
+  private supportTicketRepository: ISupportTicketRepository;
+  private supportTicketUseCase: ISupportTicketUseCase;
+  private supportTicketController: SupportTicketController;
 
   private constructor() {
     this.userRepository = new UserRepository();
@@ -114,6 +122,7 @@ export class Container {
     this.productVariantRepository = new ProductVariantRepository();
     this.s3Service = new S3Service();
     this.redisService = new RedisService();
+    this.supportTicketRepository = new SupportTicketRepository();
 
     this.userUseCase = new UserUseCase(this.userRepository);
     this.authUseCase = new AuthUseCase(this.userRepository);
@@ -163,6 +172,9 @@ export class Container {
       this.userRepository,
       this.productRepository
     );
+    this.supportTicketUseCase = new SupportTicketUseCase(
+      this.supportTicketRepository
+    );
 
     this.userController = new UserController(this.userUseCase);
     this.authController = new AuthController(this.authUseCase);
@@ -179,6 +191,7 @@ export class Container {
     );
     this.uploadController = new UploadController(this.uploadUseCase);
     this.wishlistController = new WishlistController(this.wishlistUseCase);
+    this.supportTicketController = new SupportTicketController(this.supportTicketUseCase);
   }
 
   static getInstance(): Container {
@@ -246,6 +259,10 @@ export class Container {
 
   public getWishlistController(): WishlistController {
     return this.wishlistController;
+  }
+
+  public getSupportTicketController(): SupportTicketController {
+    return this.supportTicketController;
   }
 
   getProductUseCase(): IProductUseCase {
