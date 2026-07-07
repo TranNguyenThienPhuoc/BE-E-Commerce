@@ -6,21 +6,21 @@ export class WishlistController {
 
   async getWishlist(c: Context) {
     const user = c.get("user");
-    const response = await this.wishlistUseCase.getWishlist(user.userId);
+    const response = await this.wishlistUseCase.getWishlist(user.id);
     return c.json(response, response.success ? 200 : 400);
   }
 
   async addToWishlist(c: Context) {
     const user = c.get("user");
     const productId = c.req.param("productId");
-    const response = await this.wishlistUseCase.addToWishlist(user.userId, productId);
+    const response = await this.wishlistUseCase.addToWishlist(user.id, productId);
     return c.json(response, response.success ? 200 : 400);
   }
 
   async removeFromWishlist(c: Context) {
     const user = c.get("user");
     const productId = c.req.param("productId");
-    const response = await this.wishlistUseCase.removeFromWishlist(user.userId, productId);
+    const response = await this.wishlistUseCase.removeFromWishlist(user.id, productId);
     return c.json(response, response.success ? 200 : 400);
   }
 }
