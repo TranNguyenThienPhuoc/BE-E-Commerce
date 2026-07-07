@@ -17,12 +17,6 @@ const secretsManager = new SecretsManagerClient({ region: process.env.AWS_REGION
 export async function loadSecrets() {
   const secretName = process.env.SECRET_NAME || 'ecommerce/production/secrets';
   
-  // If we are in local development and no secret name is provided, fallback to .env
-  if (process.env.NODE_ENV !== 'production' && !process.env.SECRET_NAME) {
-    console.log("Using local .env values for configuration.");
-    return;
-  }
-
   try {
     const response = await secretsManager.send(
       new GetSecretValueCommand({
