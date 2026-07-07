@@ -289,7 +289,7 @@ export class ProductUseCase implements IProductUseCase {
       const skip = (page - 1) * limit;
 
       // 1. Tạo cache key dựa trên tham số query
-      const cacheKey = `products:list:${page}:${limit}:${request.category || 'all'}:${request.status || 'all'}:${request.search || 'none'}:${request.sortBy || 'none'}:${request.sortOrder || 'none'}:${role === 'admin' ? 'admin' : 'user'}`;
+      const cacheKey = `products:list:${page}:${limit}:${request.category || 'all'}:${request.status || 'all'}:${request.search || 'none'}:${request.isFlashSale !== undefined ? request.isFlashSale : 'all'}:${request.sortBy || 'none'}:${request.sortOrder || 'none'}:${role === 'admin' ? 'admin' : 'user'}`;
       
       // 2. Thử đọc từ Redis
       const cachedData = await this.redisService.get<any>(cacheKey);
@@ -303,6 +303,7 @@ export class ProductUseCase implements IProductUseCase {
         status: request.status,
         search: request.search,
         isAdmin: role === "admin",
+        isFlashSale: request.isFlashSale,
       });
 
       this.sortProducts(products, request.sortBy, request.sortOrder);

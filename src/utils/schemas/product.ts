@@ -25,6 +25,9 @@ export const ProductSchema = z
       .enum(["active", "inactive", "out_of_stock", "pending", "rejected", "archived", "draft"])
       .default("pending"),
     variants: z.array(ProductVariantSchema).optional().default([]),
+    isFlashSale: z.boolean().default(false),
+    flashSalePrice: PositiveNumberSchema.optional(),
+    flashSaleEndDate: z.string().optional(),
   })
   .refine(...entityDateRefinement);
 
@@ -44,6 +47,9 @@ export const CreateProductSchema = z.object({
     .optional()
     .default("pending"),
   variants: z.array(ProductVariantSchema).optional().default([]),
+  isFlashSale: z.boolean().optional().default(false),
+  flashSalePrice: PositiveNumberSchema.optional(),
+  flashSaleEndDate: z.string().optional(),
 });
 
 /**
@@ -62,6 +68,9 @@ export const UpdateProductSchema = z
       .enum(["active", "inactive", "out_of_stock", "pending", "rejected", "archived", "draft"])
       .optional(),
     variants: z.array(ProductVariantSchema).optional(),
+    isFlashSale: z.boolean().optional(),
+    flashSalePrice: PositiveNumberSchema.optional().nullable(),
+    flashSaleEndDate: z.string().optional().nullable(),
   })
   .refine(...atLeastOneFieldRefinement);
 
@@ -93,6 +102,9 @@ export const ProductInputSchema = z.object({
     )
     .optional()
     .default([]),
+  isFlashSale: z.boolean().optional().default(false),
+  flashSalePrice: PositiveNumberSchema.optional(),
+  flashSaleEndDate: z.string().optional(),
 });
 
 export const SanitizedProductInputSchema = ProductInputSchema.transform((data) => ({

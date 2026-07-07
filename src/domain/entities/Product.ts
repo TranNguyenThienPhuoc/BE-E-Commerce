@@ -19,6 +19,9 @@ export class ProductEntity implements Product {
   private categoryValue?: string;
   private statusValue: ProductStatus;
   private variantsValue: ProductVariant[];
+  private isFlashSaleValue: boolean;
+  private flashSalePriceValue?: number | null;
+  private flashSaleEndDateValue?: string | null;
   private createdAtValue: Date;
   private updatedAtValue: Date;
 
@@ -35,6 +38,9 @@ export class ProductEntity implements Product {
     variants: ProductVariant[] = [],
     createdAt?: Date,
     updatedAt?: Date,
+    isFlashSale: boolean = false,
+    flashSalePrice?: number | null,
+    flashSaleEndDate?: string | null,
   ) {
     this.idValue = id;
     this.nameValue = name;
@@ -46,6 +52,9 @@ export class ProductEntity implements Product {
     this.categoryValue = category;
     this.statusValue = status;
     this.variantsValue = variants;
+    this.isFlashSaleValue = isFlashSale;
+    this.flashSalePriceValue = flashSalePrice;
+    this.flashSaleEndDateValue = flashSaleEndDate;
     this.createdAtValue = createdAt ?? new Date();
     this.updatedAtValue = updatedAt ?? new Date();
   }
@@ -88,6 +97,18 @@ export class ProductEntity implements Product {
 
   get variants(): ProductVariant[] {
     return this.variantsValue;
+  }
+
+  get isFlashSale(): boolean {
+    return this.isFlashSaleValue;
+  }
+
+  get flashSalePrice(): number | undefined | null {
+    return this.flashSalePriceValue;
+  }
+
+  get flashSaleEndDate(): string | undefined | null {
+    return this.flashSaleEndDateValue;
   }
 
   get createdAt(): Date {
@@ -143,6 +164,21 @@ export class ProductEntity implements Product {
     this.updatedAtValue = new Date();
   }
 
+  set isFlashSale(value: boolean) {
+    this.isFlashSaleValue = value;
+    this.updatedAtValue = new Date();
+  }
+
+  set flashSalePrice(value: number | undefined | null) {
+    this.flashSalePriceValue = value;
+    this.updatedAtValue = new Date();
+  }
+
+  set flashSaleEndDate(value: string | undefined | null) {
+    this.flashSaleEndDateValue = value;
+    this.updatedAtValue = new Date();
+  }
+
   isInStock(): boolean {
     return this.stockValue > 0 && this.statusValue === "active";
   }
@@ -171,6 +207,9 @@ export class ProductEntity implements Product {
       category: this.category,
       status: this.status,
       variants: this.variants,
+      isFlashSale: this.isFlashSale,
+      flashSalePrice: this.flashSalePrice,
+      flashSaleEndDate: this.flashSaleEndDate,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -190,6 +229,9 @@ export class ProductEntity implements Product {
       data.variants || [],
       data.createdAt,
       data.updatedAt,
+      data.isFlashSale,
+      data.flashSalePrice,
+      data.flashSaleEndDate
     );
   }
 

@@ -45,6 +45,9 @@ export class ProductRepository extends BaseRepository implements IProductReposit
       images: Array.isArray(item.images) ? (item.images as string[]) : [],
       category: item.category as string | undefined,
       status: (item.status as ProductStatus) || "pending",
+      isFlashSale: item.isFlashSale === true,
+      flashSalePrice: item.flashSalePrice as number | undefined,
+      flashSaleEndDate: item.flashSaleEndDate as string | undefined,
       variants: Array.isArray(item.variants)
         ? (item.variants as any[]).map((v) => ({
             ...v,
@@ -154,6 +157,7 @@ export class ProductRepository extends BaseRepository implements IProductReposit
     search?: string;
     isAdmin?: boolean;
     userId?: string;
+    isFlashSale?: boolean;
   }): Promise<Product[]> {
     const filterExpressions: string[] = [];
     const expressionAttributeValues: Record<string, unknown> = {};
@@ -174,7 +178,11 @@ export class ProductRepository extends BaseRepository implements IProductReposit
       }
     }
 
-
+    if (filters?.isFlashSale !== undefined) {
+      filterExpressions.push("#isFlashSale = :isFlashSale");
+      expressionAttributeValues[":isFlashSale"] = filters.isFlashSale;
+      expressionAttributeNames["#isFlashSale"] = "isFlashSale";
+    }
 
     if (filters?.category) {
       filterExpressions.push("#category = :category");

@@ -13,6 +13,7 @@ export interface IProductRepository {
     search?: string;
     isAdmin?: boolean;
     userId?: string;
+    isFlashSale?: boolean;
   }): Promise<Product[]>;
 
   save(product: Product): Promise<Product>;

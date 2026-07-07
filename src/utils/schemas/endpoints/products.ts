@@ -24,6 +24,9 @@ export const CreateProductRequestSchema = z.object({
     attributes: z.record(z.string(), z.any()),
     imageUrl: URLSchema.optional(),
   })).optional().default([]),
+  isFlashSale: z.boolean().optional().default(false),
+  flashSalePrice: PositiveNumberSchema.optional(),
+  flashSaleEndDate: z.string().optional(),
 });
 
 /**
@@ -63,6 +66,9 @@ export const UpdateProductRequestSchema = z.object({
     attributes: z.record(z.string(), z.any()).optional(),
     imageUrl: URLSchema.optional(),
   })).optional(),
+  isFlashSale: z.boolean().optional(),
+  flashSalePrice: PositiveNumberSchema.optional().nullable(),
+  flashSaleEndDate: z.string().optional().nullable(),
 });
 
 /**
@@ -91,6 +97,7 @@ export const ListProductsRequestSchema = z.object({
   category: z.string().optional(),
   status: productStatusEnum.optional(),
   search: z.string().optional(),
+  isFlashSale: z.coerce.boolean().optional(),
   sortBy: z.string().optional().default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
 });
