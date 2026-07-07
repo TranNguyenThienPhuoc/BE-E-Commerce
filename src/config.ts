@@ -34,8 +34,6 @@ export async function loadSecrets() {
       if (secrets.BACKEND_URL) config.backendUrl = secrets.BACKEND_URL;
       if (secrets.JWT_SECRET) config.jwtSecret = secrets.JWT_SECRET;
       if (secrets.SQS_ORDER_QUEUE_URL) config.sqsQueueUrl = secrets.SQS_ORDER_QUEUE_URL;
-      if (secrets.REDIS_URL) config.redisUrl = secrets.REDIS_URL;
-      
       console.log("Successfully loaded secrets from AWS Secrets Manager.");
     }
   } catch (error) {

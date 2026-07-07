@@ -27,7 +27,7 @@ export class PaymentUseCase implements IPaymentUseCase {
   constructor(
     private paymentRepository: IPaymentRepository,
     private orderRepository: IOrderRepository,
-  ) {}
+  ) { }
 
   async createPayment(input: CreatePaymentInput): Promise<ApiResponse<Payment>> {
     try {
@@ -111,7 +111,7 @@ export class PaymentUseCase implements IPaymentUseCase {
 
       const payment = PaymentEntity.fromValidatedData(paymentData);
       const oldStatus = payment.status;
-      
+
       if (input.status) payment.status = input.status;
       if (input.transactionId) payment.transactionId = input.transactionId;
       if (input.notes) payment.notes = input.notes;
@@ -153,7 +153,7 @@ export class PaymentUseCase implements IPaymentUseCase {
       }
 
       const payment = PaymentEntity.fromValidatedData(paymentData);
-      
+
       payment.status = "completed";
       payment.transactionId = `TXN-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
 
@@ -199,7 +199,7 @@ export class PaymentUseCase implements IPaymentUseCase {
 
       // Generate a numeric orderCode (timestamp last 6 digits + 3 random digits)
       const orderCode = Number(String(Date.now()).slice(-6) + Math.floor(Math.random() * 1000));
-      
+
       const paymentData = {
         orderCode: orderCode,
         amount: orderData.totalAmount,
@@ -208,12 +208,8 @@ export class PaymentUseCase implements IPaymentUseCase {
         returnUrl: `${config.frontendUrl}/payment/success?order_id=${orderId}`,
       };
 
-      console.log("[PayOS Debug] clientId:", config.payosClientId ? config.payosClientId.substring(0, 8) + "..." : "EMPTY");
-      console.log("[PayOS Debug] apiKey:", config.payosApiKey ? config.payosApiKey.substring(0, 8) + "..." : "EMPTY");
-      console.log("[PayOS Debug] checksumKey:", config.payosChecksumKey ? config.payosChecksumKey.substring(0, 8) + "..." : "EMPTY");
       const paymentLink = await this.payos.paymentRequests.create(paymentData);
 
-      
       if (!paymentLink.checkoutUrl) {
         return StatusBuilder.fail("Failed to create PayOS session URL");
       }
@@ -247,15 +243,15 @@ export class PaymentUseCase implements IPaymentUseCase {
       if (webhookData.code === "00" || webhookData.code === "success") {
         // Payment successful
         const orderCode = webhookData.orderCode;
-        
+
         // Find order by paymentIntentId (which stores the orderCode)
         const orderData = await this.orderRepository.findByPaymentIntentId?.(String(orderCode));
-        
+
         if (orderData && orderData.paymentStatus !== "paid") {
           const order = OrderEntity.fromValidatedData(orderData);
           order.paymentStatus = "paid";
           order.paidAt = new Date().toISOString();
-          
+
           if (order.status === "pending") {
             order.status = "confirmed";
           }
