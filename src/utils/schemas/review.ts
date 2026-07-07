@@ -27,7 +27,7 @@ export const ReviewSchema = z.object({
  * Schema for validating review creation input (CreateReviewRequest)
  */
 export const CreateReviewSchema = z.object({
-  orderId: IDSchema,
+  orderId: IDSchema.optional(),
   rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating cannot exceed 5'),
   comment: z.string().min(1, 'Comment is required').max(1000, 'Comment must be less than 1000 characters'),
   images: z.array(URLSchema).optional().default([]),

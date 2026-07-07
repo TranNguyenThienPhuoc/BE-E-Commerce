@@ -15,24 +15,34 @@ export class ReviewUseCase implements IReviewUseCase {
   async createReview(productId: string, userId: string, data: CreateReviewInput): Promise<Review> {
     ReviewEntity.validateCreation(data);
 
-    const order = await this.orderRepository.findById(data.orderId);
-    if (!order) {
-      throw new Error("Order not found");
-    }
+    let verifiedPurchase = false;
+    let orderIdToSave = "unverified-purchase"; // Default ID for unverified purchases, or we could make it optional in DB if it was supported. Wait, ReviewEntity expects orderId: string.
 
-    if (order.customerId !== userId) {
-      throw new Error("Unauthorized: This order does not belong to you");
-    }
+    if (data.orderId && data.orderId !== "placeholder-order-id") {
+      const order = await this.orderRepository.findById(data.orderId);
+      if (!order) {
+        throw new Error("Order not found");
+      }
 
-    const productInOrder = order.items.find((item) => item.productId === productId);
-    if (!productInOrder) {
-      throw new Error("Product not found in this order");
-    }
+      if (order.customerId !== userId) {
+        throw new Error("Unauthorized: This order does not belong to you");
+      }
 
-    const existingReviews = await this.reviewRepository.findByOrderId(data.orderId);
-    const alreadyReviewed = existingReviews.some((r) => r.productId === productId);
-    if (alreadyReviewed) {
-      throw new Error("You have already reviewed this product for this order");
+      const productInOrder = order.items.find((item) => item.productId === productId);
+      if (!productInOrder) {
+        throw new Error("Product not found in this order");
+      }
+
+      const existingReviews = await this.reviewRepository.findByOrderId(data.orderId);
+      const alreadyReviewed = existingReviews.some((r) => r.productId === productId);
+      if (alreadyReviewed) {
+        throw new Error("You have already reviewed this product for this order");
+      }
+      verifiedPurchase = true;
+      orderIdToSave = data.orderId;
+    } else {
+       // Optional: Check if user already reviewed this product as unverified? Let's skip to allow multiple unverified or just let DB handle it.
+       orderIdToSave = `unverified-${crypto.randomUUID()}`; // Generate a random orderId to satisfy DB schema
     }
 
     const user = await this.userRepository.findById(userId);
@@ -45,11 +55,11 @@ export class ReviewUseCase implements IReviewUseCase {
       productId,
       userId,
       user.name,
-      data.orderId,
+      orderIdToSave,
       data.rating,
       data.comment,
       data.images,
-      true, // verifiedPurchase is true since we verified the order
+      verifiedPurchase,
       0
     );
 
