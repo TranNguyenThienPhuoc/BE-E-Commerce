@@ -515,33 +515,4 @@ export class ProductUseCase implements IProductUseCase {
       error instanceof Error ? error.message : "Unknown error occurred",
     );
   }
-
-  async generatePresignedUrl(
-    request: GeneratePresignedUrlRequest,
-  ): Promise<GeneratePresignedUrlResponse> {
-    try {
-      const result = await this.s3Service.generatePresignedUrl({
-        fileName: request.fileName,
-        contentType: request.contentType,
-        folder: request.folder || "products",
-      });
-
-      return StatusBuilder.ok(result);
-    } catch (error) {
-      return StatusBuilder.fail(
-        error instanceof Error ? error.message : "Unknown error occurred",
-      );
-    }
-  }
-
-  async deleteImage(key: string): Promise<DeleteProductResponse> {
-    try {
-      await this.s3Service.deleteFile(key);
-      return StatusBuilder.ok({ success: true, message: "Image deleted" } as any);
-    } catch (error) {
-      return StatusBuilder.fail(
-        error instanceof Error ? error.message : "Unknown error occurred",
-      );
-    }
-  }
 }

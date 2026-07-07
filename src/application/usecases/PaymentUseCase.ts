@@ -16,13 +16,14 @@ import { eventBus, EVENTS } from "@/infrastructure/events/eventBus";
 import { config } from "@/config";
 import { PayOS } from "@payos/node";
 
-const payos = new PayOS({
-  clientId: config.payosClientId,
-  apiKey: config.payosApiKey,
-  checksumKey: config.payosChecksumKey
-});
-
 export class PaymentUseCase implements IPaymentUseCase {
+  private get payos() {
+    return new PayOS({
+      clientId: config.payosClientId,
+      apiKey: config.payosApiKey,
+      checksumKey: config.payosChecksumKey
+    });
+  }
   constructor(
     private paymentRepository: IPaymentRepository,
     private orderRepository: IOrderRepository,
@@ -203,11 +204,11 @@ export class PaymentUseCase implements IPaymentUseCase {
         orderCode: orderCode,
         amount: orderData.totalAmount,
         description: `Thanh toan don ${orderCode}`,
-        cancelUrl: `${config.frontendUrl}/checkout/cancel`,
-        returnUrl: `${config.frontendUrl}/checkout/success?order_id=${orderId}`,
+        cancelUrl: `${config.frontendUrl}/payment/cancel`,
+        returnUrl: `${config.frontendUrl}/payment/success?order_id=${orderId}`,
       };
 
-      const paymentLink = await payos.paymentRequests.create(paymentData);
+      const paymentLink = await this.payos.paymentRequests.create(paymentData);
       
       if (!paymentLink.checkoutUrl) {
         return StatusBuilder.fail("Failed to create PayOS session URL");
@@ -232,14 +233,19 @@ export class PaymentUseCase implements IPaymentUseCase {
   async payosWebhook(body: any): Promise<ApiResponse<any>> {
     try {
       // Verify webhook data
-      const webhookData = await payos.webhooks.verify(body);
+      let webhookData;
+      try {
+        webhookData = await this.payos.webhooks.verify(body);
+      } catch (err) {
+        return StatusBuilder.fail("Invalid webhook signature or data");
+      }
 
       if (webhookData.code === "00" || webhookData.code === "success") {
         // Payment successful
         const orderCode = webhookData.orderCode;
         
         // Find order by paymentIntentId (which stores the orderCode)
-        const orderData = await (this.orderRepository as any).findByPaymentIntentId(String(orderCode));
+        const orderData = await this.orderRepository.findByPaymentIntentId?.(String(orderCode));
         
         if (orderData && orderData.paymentStatus !== "paid") {
           const order = OrderEntity.fromValidatedData(orderData);
@@ -250,20 +256,16 @@ export class PaymentUseCase implements IPaymentUseCase {
             order.status = "confirmed";
           }
           await this.orderRepository.save(order.toJSON());
-
-          // Publish Event
           eventBus.emit(EVENTS.ORDER_PAID, order.id);
         }
       }
 
-      return StatusBuilder.ok({ received: true });
+      return StatusBuilder.ok({ success: true });
     } catch (error) {
-      console.error("PayOS webhook error:", error);
+      console.error("Webhook processing error:", error);
       return StatusBuilder.fail(
         error instanceof Error ? error.message : "Unknown error occurred",
       );
     }
   }
-
-
 }

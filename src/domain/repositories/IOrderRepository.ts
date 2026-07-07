@@ -8,5 +8,6 @@ export interface IOrderRepository {
 
   findByStatus(status: OrderStatus): Promise<Order[]>;
   findAll(): Promise<Order[]>;
+  findByPaymentIntentId(paymentIntentId: string): Promise<Order | null>;
   createOrdersAndClearCart(orders: Order[], cartId: string): Promise<Order[]>;
 }
