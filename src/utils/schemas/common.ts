@@ -44,7 +44,7 @@ export const NameSchema = z.string()
   );
 
 
-export const UserRoleSchema = z.enum(['admin', 'customer', 'user']).default('customer');
+export const UserRoleSchema = z.enum(['admin', 'customer', 'user', 'seller']).default('customer');
 
 
 export const UUIDSchema = z.string().uuid('Invalid UUID format');
