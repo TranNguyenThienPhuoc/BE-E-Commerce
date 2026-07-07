@@ -1,4 +1,4 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDBDocumentClient } from "@/infrastructure/database";
 import { CreateCategoryInput } from "@/utils/schemas/category";
 import { randomUUID } from "crypto";
@@ -57,11 +57,24 @@ async function seedCategories() {
     throw new Error("DynamoDB table name for categories is not configured.");
   }
 
+  // Check existing
+  const existingData = await dynamoDBDocumentClient.send(
+    new ScanCommand({ TableName: TABLE_NAME })
+  );
+  const existingSlugs = new Set((existingData.Items || []).map(item => item.slug));
+
+  const toSeed = sampleCategories.filter(cat => !existingSlugs.has(cat.slug));
+
+  if (toSeed.length === 0) {
+    console.info("All categories already exist. Skipping seed.");
+    return;
+  }
+
   console.info(
-    `Seeding ${sampleCategories.length} categories into table "${TABLE_NAME}"...`,
+    `Seeding ${toSeed.length} categories into table "${TABLE_NAME}"...`,
   );
 
-  const putPromises = sampleCategories.map((category) => {
+  const putPromises = toSeed.map((category) => {
     const item = buildCategoryItem(category);
     return dynamoDBDocumentClient.send(
       new PutCommand({

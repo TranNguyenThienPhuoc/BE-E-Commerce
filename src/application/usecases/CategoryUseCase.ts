@@ -267,7 +267,22 @@ export class CategoryUseCase implements ICategoryUseCase {
       const limit = request.limit || 10;
       const skip = (page - 1) * limit;
 
-      const categories: Category[] = await this.categoryRepository.findAll();
+      const allCategories: Category[] = await this.categoryRepository.findAll();
+
+      // Filter duplicates by slug
+      const uniqueCategoriesMap = new Map<string, Category>();
+      for (const cat of allCategories) {
+        if (!uniqueCategoriesMap.has(cat.slug)) {
+          uniqueCategoriesMap.set(cat.slug, cat);
+        } else {
+          // Keep the newer one if there are duplicates
+          const existing = uniqueCategoriesMap.get(cat.slug)!;
+          if (new Date(cat.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+             uniqueCategoriesMap.set(cat.slug, cat);
+          }
+        }
+      }
+      const categories = Array.from(uniqueCategoriesMap.values());
 
       const total = categories.length;
       const paginatedCategories = categories.slice(skip, skip + limit);
