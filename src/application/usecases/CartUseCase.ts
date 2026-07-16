@@ -58,8 +58,16 @@ export class CartUseCase implements ICartUseCase {
       }
 
       let stockAvailable = product.stock;
-      let price = product.price;
       let name = product.name;
+
+      // Tính giá hiệu lực: ưu tiên flashSalePrice nếu đang Flash Sale và chưa hết hạn
+      const isFlashSaleActive =
+        product.isFlashSale &&
+        typeof product.flashSalePrice === 'number' &&
+        product.flashSalePrice > 0 &&
+        (!product.flashSaleEndDate || new Date(product.flashSaleEndDate) > new Date());
+
+      let price = isFlashSaleActive ? (product.flashSalePrice as number) : product.price;
 
       if (validatedRequest.variantId) {
         const variant = await this.variantRepository.findById(validatedRequest.variantId);
@@ -72,7 +80,7 @@ export class CartUseCase implements ICartUseCase {
           ]);
         }
         stockAvailable = variant.stock;
-        price = variant.price;
+        price = variant.price; // variant tự có giá riêng, không ảnh hưởng bởi flash sale sản phẩm
         name = `${product.name} - ${variant.name}`;
       }
 
