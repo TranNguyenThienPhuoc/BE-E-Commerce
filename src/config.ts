@@ -1,7 +1,7 @@
 import { SSMClient, GetParametersByPathCommand } from "@aws-sdk/client-ssm";
 
 export const config = {
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl: process.env.FRONTEND_URL || 'https://zopee.xyz',
   payosClientId: process.env.PAYOS_CLIENT_ID || '',
   payosApiKey: process.env.PAYOS_API_KEY || '',
   payosChecksumKey: process.env.PAYOS_CHECKSUM_KEY || '',
