@@ -44,6 +44,10 @@ app.use(
   }),
 );
 
+// Health check route cho AWS ECS Target Group
+app.get("/", (c) => c.text("OK", 200));
+app.get("/api/health", (c) => c.text("OK", 200));
+
 setupUserRoutes(app);
 setupAuthRoutes(app);
 setupProductVariantRoutes(app);
@@ -116,5 +120,5 @@ app.onError((err, c) => {
 
 export default {
   fetch: app.fetch,
-  port: 8080,
+  port: Number(process.env.PORT) || 8080,
 };

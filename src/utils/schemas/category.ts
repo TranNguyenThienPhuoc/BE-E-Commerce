@@ -81,15 +81,17 @@ export const CategoryInputSchema = z.object({
 export const SanitizedCategoryInputSchema = CategoryInputSchema.transform(
   (data) => {
     const trimmedName = data.name.trim();
-    const slugFromSlug = data.slug
-      ?.trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    const slugFromName = trimmedName
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
+    const normalizeString = (str: string) => 
+      str
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[đĐ]/g, "d")
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+    const slugFromSlug = data.slug ? normalizeString(data.slug.trim()) : undefined;
+    const slugFromName = normalizeString(trimmedName);
 
     const finalSlug =
       slugFromSlug && slugFromSlug.length > 0 ? slugFromSlug : slugFromName;
