@@ -455,6 +455,7 @@ export class ProductUseCase implements IProductUseCase {
       ...productData,
       stock: totalStock,
       variants: [],
+      isFlashSale: false,
     });
   }
 
@@ -491,6 +492,7 @@ export class ProductUseCase implements IProductUseCase {
       const valA = a[key];
       const valB = b[key];
       if (valA === undefined || valB === undefined) return 0;
+      if (valA === null || valB === null) return 0;
       if (valA < valB) return -1 * order;
       if (valA > valB) return 1 * order;
       return 0;

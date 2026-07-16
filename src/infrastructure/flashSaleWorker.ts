@@ -32,8 +32,8 @@ export function initializeFlashSaleWorker(productRepository: IProductRepository)
           await productRepository.save({
             ...product,
             isFlashSale: false,
-            flashSalePrice: null,
-            flashSaleEndDate: null,
+            flashSalePrice: undefined,
+            flashSaleEndDate: undefined,
           });
           console.log(`[FlashSaleWorker] Disabled flash sale for product: ${product.id} (${product.name})`);
         } catch (err) {

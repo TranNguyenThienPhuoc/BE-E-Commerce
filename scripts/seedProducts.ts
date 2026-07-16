@@ -16,6 +16,7 @@ const sampleProducts: CreateProductInput[] = [
     category: "thoi-trang-phu-kien",
     status: "active",
     variants: [],
+    isFlashSale: false,
   },
   {
     name: "Cà phê Robusta Nguyên Chất",
@@ -27,6 +28,7 @@ const sampleProducts: CreateProductInput[] = [
     category: "thuc-pham-do-uong",
     status: "active",
     variants: [],
+    isFlashSale: false,
   },
   {
     name: "Sổ tay Giấy tái chế",
@@ -38,6 +40,7 @@ const sampleProducts: CreateProductInput[] = [
     category: "van-phong-pham",
     status: "active",
     variants: [],
+    isFlashSale: false,
   },
   {
     name: "Túi Tote Vải Canvas",
@@ -49,6 +52,7 @@ const sampleProducts: CreateProductInput[] = [
     category: "thoi-trang-phu-kien",
     status: "active",
     variants: [],
+    isFlashSale: false,
   },
   {
     name: "Tinh dầu Xả chanh",
@@ -60,6 +64,7 @@ const sampleProducts: CreateProductInput[] = [
     category: "suc-khoe-lam-dep",
     status: "active",
     variants: [],
+    isFlashSale: false,
   }
 ];
 
@@ -74,6 +79,7 @@ const buildProductItem = (base: CreateProductInput) => ({
   category: base.category,
   status: base.status,
   variants: base.variants,
+  isFlashSale: base.isFlashSale ?? false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 });

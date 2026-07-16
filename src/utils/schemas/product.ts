@@ -26,8 +26,8 @@ export const ProductSchema = z
       .default("pending"),
     variants: z.array(ProductVariantSchema).optional().default([]),
     isFlashSale: z.boolean().default(false),
-    flashSalePrice: PositiveNumberSchema.optional(),
-    flashSaleEndDate: z.string().optional(),
+    flashSalePrice: PositiveNumberSchema.optional().nullable(),
+    flashSaleEndDate: z.string().optional().nullable(),
   })
   .refine(...entityDateRefinement);
 
@@ -48,8 +48,8 @@ export const CreateProductSchema = z.object({
     .default("pending"),
   variants: z.array(ProductVariantSchema).optional().default([]),
   isFlashSale: z.boolean().optional().default(false),
-  flashSalePrice: PositiveNumberSchema.optional(),
-  flashSaleEndDate: z.string().optional(),
+  flashSalePrice: PositiveNumberSchema.optional().nullable(),
+  flashSaleEndDate: z.string().optional().nullable(),
 });
 
 /**
