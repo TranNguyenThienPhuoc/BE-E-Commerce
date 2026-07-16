@@ -63,6 +63,7 @@ setupSupportTicketRoutes(app);
 // Initialize Background Workers
 import { Container } from "./infrastructure/dependencies/Container";
 import { initializeSQSWorker } from "./infrastructure/sqsWorker";
+import { initializeFlashSaleWorker } from "./infrastructure/flashSaleWorker";
 const container = Container.getInstance();
 // We temporarily cast to any because we need the private paymentUseCase or add a getter for it. 
 // Actually, let's just add getPaymentUseCase to Container instead.
@@ -70,6 +71,12 @@ const container = Container.getInstance();
 const paymentUseCase = (container as any).paymentUseCase;
 if (paymentUseCase) {
   initializeSQSWorker(paymentUseCase);
+}
+
+// Flash Sale Expiry Worker: tự động tắt sản phẩm hết hạn giảm giá
+const productRepository = container.getProductRepository();
+if (productRepository) {
+  initializeFlashSaleWorker(productRepository);
 }
 
 // Health check
